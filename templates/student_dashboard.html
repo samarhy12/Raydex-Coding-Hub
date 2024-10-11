@@ -1,0 +1,234 @@
+{% extends "base.html" %} {% block title %}Student Dashboard - Raydex Coding
+Hub{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav
+      id="sidebar"
+      class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"
+    >
+      <div class="position-sticky pt-3">
+        <div class="text-center mb-4">
+          <img
+            src="{{ url_for('static', filename='images/user-avatar.png') }}"
+            alt="User Avatar"
+            class="rounded-circle"
+            width="80"
+          />
+          <h5 class="mt-2">Welcome, {{ current_user.username }}</h5>
+        </div>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">
+              <i class="fas fa-home"></i> Overview
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="fas fa-book"></i> Enrolled Courses
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="fas fa-chart-line"></i> Progress
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="fas fa-user"></i> Profile Settings
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="fas fa-bell"></i> Notifications
+              <span class="badge bg-danger">3</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="fas fa-cog"></i> Account Settings
+            </a>
+          </li>
+        </ul>
+
+        <h6
+          class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted"
+        >
+          <span>Quick Links</span>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="fas fa-question-circle"></i> Help Center
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="fas fa-info-circle"></i> FAQs
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="fas fa-life-ring"></i> Support
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Main content area -->
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+      >
+        <h1 class="h2">Your Learning Journey</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+              Share
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">
+              Export
+            </button>
+          </div>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary dropdown-toggle"
+          >
+            <i class="fas fa-calendar"></i> This week
+          </button>
+        </div>
+      </div>
+
+      <!-- Overview Cards -->
+      <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+        <div class="col">
+          <div class="card h-100 border-primary">
+            <div class="card-body">
+              <h5 class="card-title text-primary">
+                <i class="fas fa-book-reader"></i> Active Courses
+              </h5>
+              <p class="card-text display-4">{{ courses|length }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100 border-success">
+            <div class="card-body">
+              <h5 class="card-title text-success">
+                <i class="fas fa-certificate"></i> Completed Courses
+              </h5>
+              <p class="card-text display-4">{{ completed_courses_count }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100 border-info">
+            <div class="card-body">
+              <h5 class="card-title text-info">
+                <i class="fas fa-clock"></i> Learning Hours
+              </h5>
+              <p class="card-text display-4">{{ total_learning_hours }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="mt-4 mb-3">Enrolled Courses</h2>
+
+      {% if courses %}
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for course in courses %}
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <img
+              src="{{ url_for('static', filename='course_images/' ~ course.image) }}"
+              class="card-img-top"
+              alt="Course Image"
+            />
+            <div class="card-body">
+              <h5 class="card-title">{{ course.title }}</h5>
+              <p class="card-text">{{ course.description|truncate(100) }}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                  <a
+                    href="{{ url_for('course', course_id=course.id) }}"
+                    class="btn btn-sm btn-outline-secondary"
+                    >View Details</a
+                  >
+                  <a
+                    href="{{ url_for('lesson', course_id=course.id, lesson_id=course.lessons[0].id) }}"
+                    class="btn btn-sm btn-primary"
+                    >Continue</a
+                  >
+                </div>
+                <small class="text-muted"
+                  >{{ lessons_count[course.id] }} lessons</small
+                >
+              </div>
+            </div>
+            <div class="card-footer bg-transparent">
+              <h6 class="mb-1">Progress</h6>
+              <div class="progress">
+                <div
+                  class="progress-bar bg-success"
+                  role="progressbar"
+                  style="width: {{ (completed_lessons_count[course.id] / lessons_count[course.id]) * 100 }}%;"
+                  aria-valuenow="{{ completed_lessons_count[course.id] }}"
+                  aria-valuemin="0"
+                  aria-valuemax="{{ lessons_count[course.id] }}"
+                >
+                  {{ (completed_lessons_count[course.id] /
+                  lessons_count[course.id]) * 100 | round(0) }}%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="alert alert-info" role="alert">
+        <i class="fas fa-info-circle"></i> You are not enrolled in any courses
+        yet.
+      </div>
+      {% endif %}
+
+      <div class="text-center">
+        <a href="{{ url_for('courses') }}" class="btn btn-primary btn-lg mb-5">
+          <i class="fas fa-search"></i> Explore More Courses
+        </a>
+      </div>
+    </main>
+  </div>
+</div>
+
+<style>
+  body {
+    font-family: "Roboto", sans-serif;
+    background-color: #f8f9fa;
+  }
+  .sidebar {
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.1);
+  }
+  .sidebar .nav-link {
+    font-weight: 500;
+    color: #333;
+  }
+  .sidebar .nav-link.active {
+    color: #007bff;
+  }
+  .card-img-top {
+    height: 200px;
+    object-fit: cover;
+  }
+  .progress {
+    height: 10px;
+  }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+<script>
+  // Add any custom JavaScript here
+</script>
+{% endblock %}

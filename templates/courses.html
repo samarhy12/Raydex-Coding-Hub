@@ -1,0 +1,24 @@
+{% extends 'base.html' %} {% block title %}Raydex Coding Hub - Courses{%
+endblock %} {% block content %}
+<div class="container mt-5">
+  <h2 class="text-center">Available Courses</h2>
+  <div class="courses">
+    {% for course in courses %}
+    <div class="course-card">
+      <img
+        src="{{ url_for('static', filename='images/' + course.image) }}"
+        alt="{{ course.title }}"
+      />
+      <div class="course-content">
+        <h3 class="course-title">{{ course.title }}</h3>
+        <p class="course-description">{{ course.description[:100] }}...</p>
+        <div class="course-meta">
+          <span class="course-price">${{ course.price }}</span>
+          <a href="/course/{{ course.id }}" class="course-btn">Enroll Now</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends 'base.html' %} {% block title %}Raydex Coding Hub - Home{% endblock
+%} {% block content %}
+
+<section class="hero">
+  <div class="container">
+    <h1>Elevate Your Coding Skills</h1>
+    <p>Learn from industry experts and build real-world projects</p>
+    <a href="{{ url_for('courses')}}" class="btn btn-light">Explore Courses</a>
+  </div>
+</section>
+
+<section id="courses" class="container">
+  <h2 class="section-title">Featured Courses</h2>
+  <div class="courses">
+    {% for course in courses %}
+    <div class="course-card">
+      <img
+        src="{{ url_for('static', filename='images/' + course.image) }}"
+        alt="{{ course.title }}"
+      />
+      <div class="course-content">
+        <h3 class="course-title">{{ course.title }}</h3>
+        <p class="course-description">{{ course.description[:100] }}...</p>
+        <div class="course-meta">
+          <span class="course-price">${{ course.price }}</span>
+          <a href="/course/{{ course.id }}" class="btn course-btn"
+            >Enroll Now</a
+          >
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    <!-- <div class="course-card">
+      <img src="/api/placeholder/400/300" alt="Data Science Course" />
+      <div class="course-content">
+        <h3 class="course-title">Data Science Fundamentals</h3>
+        <p class="course-description">
+          Learn to analyze and interpret complex data
+        </p>
+        <div class="course-meta">
+          <span class="course-price">$89.99</span>
+          <a href="#" class="btn">Enroll Now</a>
+        </div>
+      </div>
+    </div>
+    <div class="course-card">
+      <img src="/api/placeholder/400/300" alt="Machine Learning Course" />
+      <div class="course-content">
+        <h3 class="course-title">Machine Learning A-Z</h3>
+        <p class="course-description">
+          Build intelligent systems and predictive models
+        </p>
+        <div class="course-meta">
+          <span class="course-price">$129.99</span>
+          <a href="#" class="btn">Enroll Now</a>
+        </div>
+      </div>
+    </div> -->
+  </div>
+</section>
+
+<section id="categories" class="container">
+  <h2 class="section-title">Browse Categories</h2>
+  <div class="categories">
+    <div class="category-card">
+      <i class="fas fa-code"></i>
+      <h3>Web Development</h3>
+      <a href="#" class="btn">Explore</a>
+    </div>
+    <div class="category-card">
+      <i class="fas fa-database"></i>
+      <h3>Data Science</h3>
+      <a href="#" class="btn">Explore</a>
+    </div>
+    <div class="category-card">
+      <i class="fas fa-robot"></i>
+      <h3>Machine Learning</h3>
+      <a href="#" class="btn">Explore</a>
+    </div>
+    <div class="category-card">
+      <i class="fas fa-mobile-alt"></i>
+      <h3>Mobile Development</h3>
+      <a href="#" class="btn">Explore</a>
+    </div>
+  </div>
+</section>
+
+<section id="instructors" class="container">
+  <h2 class="section-title">Meet Our Top Instructors</h2>
+  <div class="instructors">
+    <div class="instructor-card">
+      <img src="/api/placeholder/400/400" alt="John Doe" />
+      <div class="instructor-content">
+        <h3 class="instructor-name">John Doe</h3>
+        <p class="instructor-title">Web Development Expert</p>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-linkedin"></i></a>
+          <a href="#"><i class="fab fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="instructor-card">
+      <img src="/api/placeholder/400/400" alt="Jane Smith" />
+      <div class="instructor-content">
+        <h3 class="instructor-name">Jane Smith</h3>
+        <p class="instructor-title">Data Science Specialist</p>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-linkedin"></i></a>
+          <a href="#"><i class="fab fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Section -->
+<div class="cta">
+  <h2>Ready to Start Learning?</h2>
+  <p>Join us today and take your first step towards mastering coding!</p>
+  <a href="/register" class="course-btn">Sign Up Now</a>
+</div>
+{% endblock %}

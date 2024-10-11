@@ -1,0 +1,96 @@
+{% extends "base.html" %} {% block title %}Code Playground{% endblock %} {%
+block content %}
+<div class="container mt-4">
+  <h1 class="text-center">Code Playground</h1>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-group mb-3">
+        <label for="htmlCode">HTML</label>
+        <textarea
+          id="htmlCode"
+          class="form-control code-box"
+          rows="10"
+          placeholder="Write your HTML code here..."
+        ></textarea>
+      </div>
+      <div class="form-group mb-3">
+        <label for="cssCode">CSS</label>
+        <textarea
+          id="cssCode"
+          class="form-control code-box"
+          rows="10"
+          placeholder="Write your CSS code here..."
+        ></textarea>
+      </div>
+      <div class="form-group mb-3">
+        <label for="jsCode">JavaScript</label>
+        <textarea
+          id="jsCode"
+          class="form-control code-box"
+          rows="10"
+          placeholder="Write your JavaScript code here..."
+        ></textarea>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <h3>Output</h3>
+      <iframe
+        id="outputFrame"
+        style="width: 100%; height: 500px; border: 1px solid #ccc"
+      ></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+  const htmlCode = document.getElementById("htmlCode");
+  const cssCode = document.getElementById("cssCode");
+  const jsCode = document.getElementById("jsCode");
+  const outputFrame = document.getElementById("outputFrame");
+
+  function runCode() {
+    const output = outputFrame.contentWindow.document;
+    output.open();
+    output.write(
+      htmlCode.value +
+        "<style>" +
+        cssCode.value +
+        "</style><script>" +
+        jsCode.value +
+        "<\/script>"
+    );
+    output.close();
+  }
+
+  // Run code when typing in any of the textareas
+  htmlCode.addEventListener("input", runCode);
+  cssCode.addEventListener("input", runCode);
+  jsCode.addEventListener("input", runCode);
+</script>
+
+<style>
+  /* Custom Styles */
+  .code-box {
+    height: 150px; /* Fixed height for all code boxes */
+    font-family: "Courier New", Courier, monospace; /* Monospace font for code */
+    background-color: #f8f9fa; /* Light background for code boxes */
+    border: 1px solid #ced4da; /* Border for code boxes */
+    border-radius: 5px; /* Rounded corners */
+  }
+
+  .code-box:focus {
+    border-color: #28a745; /* Green border on focus */
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); /* Subtle shadow effect */
+  }
+
+  h3 {
+    margin-top: 1.5rem; /* Margin for output section title */
+  }
+
+  @media (max-width: 768px) {
+    .code-box {
+      height: 100px; /* Reduced height for smaller screens */
+    }
+  }
+</style>
+{% endblock %}

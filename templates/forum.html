@@ -1,0 +1,119 @@
+{% extends "base.html" %} {% block content %}
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .header {
+    background-color: #ffffff;
+    padding: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  .header h1 {
+    color: #1877f2;
+    margin: 0;
+    padding: 0 20px;
+  }
+  .post-form {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .post-form textarea {
+    width: 100%;
+    border: none;
+    resize: none;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+  .post-form button {
+    background-color: #1877f2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .post {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .post h2 {
+    margin-top: 0;
+  }
+  .post-meta {
+    color: #65676b;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  .post-actions {
+    margin-top: 15px;
+  }
+  .post-actions button {
+    background-color: #e4e6eb;
+    border: none;
+    padding: 8px 12px;
+    margin-right: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .post-actions button:hover {
+    background-color: #d8dadf;
+  }
+</style>
+
+<div class="container">
+  <!-- Post Form -->
+  <div class="post-form">
+    <form method="POST" action="{{ url_for('new_post') }}">
+      <textarea
+        name="content"
+        placeholder="What's on your mind?"
+        rows="3"
+      ></textarea>
+      <button type="submit">Post</button>
+    </form>
+  </div>
+
+  <!-- Posts Container -->
+  <div id="posts-container">
+    {% for post in posts %}
+    <div class="post">
+      <h2>{{ post.author.username }}</h2>
+      <div class="post-meta">
+        {{ post.date_posted.strftime('%Y-%m-%d %H:%M:%S') }}
+      </div>
+      <p>{{ post.content }}</p>
+      <div class="post-actions">
+        <button>
+          <i class="fas fa-thumbs-up"></i> Like ({{ post.likes }})
+        </button>
+        <button
+          onclick="window.location.href='{{ url_for('view_post', post_id=post.id) }}'"
+        >
+          <i class="fas fa-comment"></i> Comment ({{ post.comments|length }})
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

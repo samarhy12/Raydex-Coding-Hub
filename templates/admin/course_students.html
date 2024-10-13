@@ -1,0 +1,32 @@
+{% extends "base.html" %} {% block content %}
+<h1 class="mb-4">Students Enrolled in {{ course.title }}</h1>
+<a
+  href="{{ url_for('admin_email_course', course_id=course.id) }}"
+  class="btn btn-primary mb-3"
+  >Email All Students</a
+>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for student in students %}
+    <tr>
+      <td>{{ student.username }}</td>
+      <td>{{ student.email }}</td>
+      <td>
+        <a
+          href="{{ url_for('admin_user_progress', user_id=student.id) }}"
+          class="btn btn-sm btn-info"
+          >View Progress</a
+        >
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -10,12 +10,12 @@ Hub{% endblock %} {% block content %}
       <div class="position-sticky pt-3">
         <div class="text-center mb-4">
           <img
-            src="{{ url_for('static', filename='images/user-avatar.png') }}"
-            alt="User Avatar"
-            class="rounded-circle"
-            width="80"
+            src="https://ui-avatars.com/api/?name={{ current_user.username }}&background=2ecc71&color=fff"
+            alt="Profile"
+            class="rounded-circle me-2"
+            style="width: 32px; height: 32px"
           />
-          <h5 class="mt-2">Welcome, {{ current_user.username }}</h5>
+          <h5 class="mt-2">{{ current_user.username }}</h5>
         </div>
         <ul class="nav flex-column">
           <li class="nav-item">
@@ -23,27 +23,13 @@ Hub{% endblock %} {% block content %}
               <i class="fas fa-home"></i> Overview
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <i class="fas fa-book"></i> Enrolled Courses
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <i class="fas fa-chart-line"></i> Progress
-            </a>
-          </li>
+
           <li class="nav-item">
             <a class="nav-link" href="#">
               <i class="fas fa-user"></i> Profile Settings
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <i class="fas fa-bell"></i> Notifications
-              <span class="badge bg-danger">3</span>
-            </a>
-          </li>
+
           <li class="nav-item">
             <a class="nav-link" href="#">
               <i class="fas fa-cog"></i> Account Settings
@@ -142,7 +128,7 @@ Hub{% endblock %} {% block content %}
         <div class="col">
           <div class="card h-100 shadow-sm">
             <img
-              src="{{ url_for('static', filename='course_images/' ~ course.image) }}"
+              src="{{ url_for('static', filename='images/' ~ course.image) }}"
               class="card-img-top"
               alt="Course Image"
             />

@@ -1,95 +1,146 @@
-{% extends 'base.html' %} {% block title %} Raydex Coding Hub - {{ course.title
-}} {% endblock %} {% block content %}
+{% extends 'base.html' %} {% block title %}Raydex Coding Hub - {{ course.title
+}}{% endblock %} {% block content %}
+
 <div class="container mt-5">
-  <!-- Course Title and Description -->
   <div class="row">
-    <div class="col-md-8">
-      <h1>{{ course.title }}</h1>
-      <p>{{ course.description }}</p>
-      <p>Price: ${{ course.price }}</p>
-    </div>
-    <div class="col-md-4">
-      <img
-        src="{{ url_for('static', filename='images/' + course.image) }}"
-        alt="{{ course.title }}"
-        class="img-fluid rounded"
-      />
-    </div>
-  </div>
+    <div class="col-lg-8">
+      <h1 class="display-4 mb-4">{{ course.title }}</h1>
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <p class="lead">{{ course.description }}</p>
+          <div class="d-flex justify-content-between align-items-center mt-4">
+            <h3 class="text-primary mb-0">${{ course.price }}</h3>
+            {% if current_user.is_authenticated %} {% if not enrolled %}
+            <form
+              action="{{ url_for('enroll', course_id=course.id) }}"
+              method="post"
+            >
+              <button type="submit" class="btn btn-lg btn-success">
+                Enroll Now
+              </button>
+            </form>
+            {% endif %} {% else %}
+            <a
+              href="{{ url_for('login') }}"
+              class="btn btn-lg btn-outline-primary"
+              >Login to Enroll</a
+            >
+            {% endif %}
+          </div>
+        </div>
+      </div>
 
-  <hr />
-
-  <!-- Enrollment Section -->
-  {% if current_user.is_authenticated %} {% if enrolled %}
-  <!-- Progress Bar for Enrolled Users -->
-  <div class="progress mt-3">
-    <div
-      class="progress-bar"
-      role="progressbar"
-      style="width: {{ (completed_lessons_count / lessons_count) * 100 }}%"
-      aria-valuenow="{{ completed_lessons_count }}"
-      aria-valuemin="0"
-      aria-valuemax="{{ lessons_count }}"
-    >
-      {{ completed_lessons_count }} / {{ lessons_count }} Lessons Completed
-    </div>
-  </div>
-
-  <div class="mt-4">
-    <!-- Display "Continue" button if next lesson is available -->
-    {% if next_lesson %}
-    <a
-      href="{{ url_for('lesson', course_id=course.id, lesson_id=next_lesson.id) }}"
-      class="btn btn-success"
-      >Continue to Next Lesson: {{ next_lesson.title }}</a
-    >
-    {% else %}
-    <p class="text-success">
-      Congratulations! You've completed all lessons in this course.
-    </p>
-    {% endif %}
-  </div>
-
-  <!-- Display list of lessons with completion status -->
-  <h2 class="mt-4">Course Lessons</h2>
-  <ul class="list-group">
-    {% for lesson in lessons %}
-    <li
-      class="list-group-item d-flex justify-content-between align-items-center"
-    >
-      <a
-        href="{{ url_for('lesson', course_id=course.id, lesson_id=lesson.id) }}"
-        class="text-decoration-none"
-        >{{ lesson.title }}</a
-      >
-      {% if lesson.id in completed_lessons_ids %}
-      <span class="badge bg-success rounded-pill">Completed</span>
-      {% else %}
-      <span class="badge bg-primary rounded-pill">Pending</span>
+      {% if current_user.is_authenticated and enrolled %}
+      <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title">Your Progress</h4>
+          <div class="progress mt-3">
+            <div
+              class="progress-bar bg-success"
+              role="progressbar"
+              style="width: {{ (completed_lessons_count / lessons_count) * 100 }}%"
+              aria-valuenow="{{ completed_lessons_count }}"
+              aria-valuemin="0"
+              aria-valuemax="{{ lessons_count }}"
+            >
+              {{ completed_lessons_count }} / {{ lessons_count }} Lessons
+            </div>
+          </div>
+          {% if next_lesson %}
+          <div class="mt-4 text-center">
+            <a
+              href="{{ url_for('lesson', course_id=course.id, lesson_id=next_lesson.id) }}"
+              class="btn btn-lg btn-success"
+            >
+              Continue to Next Lesson: {{ next_lesson.title }}
+            </a>
+          </div>
+          {% else %}
+          <div class="alert alert-success mt-4" role="alert">
+            <h4 class="alert-heading">Congratulations!</h4>
+            <p>You've completed all lessons in this course.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
       {% endif %}
-    </li>
-    {% endfor %}
-  </ul>
-  {% else %}
-  <!-- Button to Enroll if not enrolled -->
-  <form action="{{ url_for('enroll', course_id=course.id) }}" method="post">
-    <button type="submit" class="btn btn-primary mt-3">
-      Enroll in this Course
-    </button>
-  </form>
-  {% endif %} {% else %}
-  <!-- Prompt to log in if user is not logged in -->
-  <p>
-    Please <a href="{{ url_for('login') }}">login</a> to enroll in this course
-    and track your progress.
-  </p>
-  {% endif %}
 
-  <hr />
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title mb-4">Course Lessons</h4>
+          <div class="list-group">
+            {% for lesson in lessons %}
+            <a
+              href="{{ url_for('lesson', course_id=course.id, lesson_id=lesson.id) }}"
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            >
+              {{ lesson.title }} {% if lesson.id in completed_lessons_ids %}
+              <span class="badge bg-success rounded-pill">Completed</span>
+              {% else %}
+              <span class="badge bg-primary rounded-pill">Pending</span>
+              {% endif %}
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <!-- Back to Courses Button -->
-  <a href="{{ url_for('courses') }}" class="btn btn-secondary mt-3"
-    >Back to Courses</a
-  >
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <img
+          src="{{ url_for('static', filename='images/' + course.image) }}"
+          class="card-img-top"
+          alt="{{ course.title }}"
+        />
+        <div class="card-body">
+          <h5 class="card-title">What You'll Learn</h5>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <i class="fas fa-check text-success me-2"></i>Key skill 1
+            </li>
+            <li class="list-group-item">
+              <i class="fas fa-check text-success me-2"></i>Key skill 2
+            </li>
+            <li class="list-group-item">
+              <i class="fas fa-check text-success me-2"></i>Key skill 3
+            </li>
+          </ul>
+        </div>
+        <div class="card-footer">
+          <small class="text-muted">Last updated 3 mins ago</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-5">
+    <a href="{{ url_for('courses') }}" class="btn btn-secondary"
+      >Back to Courses</a
+    >
+  </div>
 </div>
+
+<style>
+  body {
+    background-color: #f8f9fa;
+  }
+  .card {
+    border: none;
+    transition: transform 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+  }
+  .progress {
+    height: 25px;
+  }
+  .progress-bar {
+    line-height: 25px;
+  }
+  .list-group-item:hover {
+    background-color: #f1f3f5;
+  }
+</style>
+
 {% endblock %}

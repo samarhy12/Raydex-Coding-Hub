@@ -1,0 +1,52 @@
+{% extends "base.html" %} {% block content %}
+<h1 class="mb-4">Manage Users</h1>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Admin</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+    <tr>
+      <td>{{ user.username }}</td>
+      <td>{{ user.email }}</td>
+      <td>{% if user.is_admin %}Yes{% else %}No{% endif %}</td>
+      <td>
+        <a
+          href="{{ url_for('admin_user_progress', user_id=user.id) }}"
+          class="btn btn-sm btn-info"
+          >View Progress</a
+        >
+        {% if not user.is_admin %}
+        <form
+          method="POST"
+          action="{{ url_for('make_admin', user_id=user.id) }}"
+          style="display: inline"
+        >
+          <button type="submit" class="btn btn-sm btn-warning">
+            Make Admin
+          </button>
+        </form>
+        {% endif %}
+        <form
+          method="POST"
+          action="{{ url_for('admin_enroll_user', user_id=user.id) }}"
+          style="display: inline"
+        >
+          <select name="course_id" required>
+            {% for course in courses %}
+            <option value="{{ course.id }}">{{ course.title }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-sm btn-success">Enroll</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

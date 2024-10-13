@@ -93,7 +93,8 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
-  margin: 4rem;
+  margin-bottom: 4rem;
+  margin-top: 4rem;
 }
 
 .course-card {
@@ -448,4 +449,108 @@ button:hover {
 
 .register-link a:hover {
   text-decoration: underline;
+}
+
+/* Container for flash messages */
+#flash-messages {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Base styles for flash messages */
+.flash-message {
+  display: inline-block;
+  padding: 12px 24px;
+  margin: 0 auto 15px;
+  border-radius: 30px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
+  transform: translateY(-20px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Success message */
+.flash-success {
+  color: #ffffff;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Danger message */
+.flash-danger {
+  color: #ffffff;
+  background: linear-gradient(135deg, #dc3545, #f56565);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Info message */
+.flash-info {
+  color: #ffffff;
+  background: linear-gradient(135deg, #17a2b8, #4299e1);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Warning message */
+.flash-warning {
+  color: #ffffff;
+  background: linear-gradient(135deg, #ffc107, #f6ad55);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Animation for message appearance */
+.flash-message-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hover effect */
+.flash-message:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Media query for smaller screens */
+@media (max-width: 480px) {
+  #flash-messages {
+    width: 95%;
+  }
+
+  .flash-message {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+}
+
+/* High-contrast styles for better visibility on green backgrounds */
+.high-contrast .flash-message {
+  background: #ffffff;
+  color: #333333;
+  text-shadow: none;
+  border: 2px solid currentColor;
+}
+
+.high-contrast .flash-success {
+  color: #1e7e34;
+}
+
+.high-contrast .flash-danger {
+  color: #bd2130;
+}
+
+.high-contrast .flash-info {
+  color: #117a8b;
+}
+
+.high-contrast .flash-warning {
+  color: #d39e00;
 }

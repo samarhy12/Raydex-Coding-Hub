@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSRF Token Error</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #f8f9fa;
+        color: #333;
+      }
+      .container {
+        margin-top: 100px;
+      }
+      h1 {
+        color: #dc3545;
+      }
+      p {
+        font-size: 18px;
+      }
+      a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .button:hover {
+        background-color: #218838;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Security Token Error</h1>
+      <p>
+        There was a problem with the security validation for your request.
+        Please try again.
+      </p>
+      <a href="{{ url_for('home') }}" class="button">Go Back to Homepage</a>
+      <p>If this error continues, please contact support.</p>
+    </div>
+  </body>
+</html>

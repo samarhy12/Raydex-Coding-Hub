@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% block content %}
+<h1 class="mb-4">Progress for {{ user.username }}</h1>
+{% for course_id, data in progress.items() %}
+<div class="card mb-3">
+  <div class="card-body">
+    <h5 class="card-title">{{ data['course'].title }}</h5>
+    <p class="card-text">
+      Completed {{ data['completed'] }} out of {{ data['total'] }} lessons
+    </p>
+    <div class="progress">
+      <div
+        class="progress-bar"
+        role="progressbar"
+        style="width: {{ (data['completed'] / data['total']) * 100 }}%"
+        aria-valuenow="{{ data['completed'] }}"
+        aria-valuemin="0"
+        aria-valuemax="{{ data['total'] }}"
+      ></div>
+    </div>
+  </div>
+</div>
+{% endfor %} {% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %} {% block content %}
+<h1 class="mb-4">Email Students in {{ course.title }}</h1>
+<form method="POST">
+  <div class="form-group">
+    <label for="subject">Subject</label>
+    <input
+      type="text"
+      class="form-control"
+      id="subject"
+      name="subject"
+      required
+    />
+  </div>
+  <div class="form-group">
+    <label for="body">Email Body</label>
+    <textarea
+      class="form-control"
+      id="body"
+      name="body"
+      rows="10"
+      required
+    ></textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">Send Email</button>
+</form>
+{% endblock %}

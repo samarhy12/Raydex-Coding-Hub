@@ -1,0 +1,50 @@
+{% extends "base.html" %} {% block content %}
+<h1 class="mb-4">Manage Lessons for {{ course.title }}</h1>
+<form method="POST" class="mb-4">
+  <div class="form-group">
+    <label for="title">Lesson Title</label>
+    <input type="text" class="form-control" id="title" name="title" required />
+  </div>
+  <div class="form-group">
+    <label for="content">Content</label>
+    <textarea
+      class="form-control"
+      id="content"
+      name="content"
+      rows="3"
+      required
+    ></textarea>
+  </div>
+  <div class="form-group">
+    <label for="video_url">Video URL</label>
+    <input
+      type="url"
+      class="form-control"
+      id="video_url"
+      name="video_url"
+      required
+    />
+  </div>
+  <button type="submit" class="btn btn-primary">Add Lesson</button>
+</form>
+<h2>Existing Lessons</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for lesson in lessons %}
+    <tr>
+      <td>{{ lesson.title }}</td>
+      <td>
+        <a href="#" class="btn btn-sm btn-info">Edit</a>
+        <a href="#" class="btn btn-sm btn-danger">Delete</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

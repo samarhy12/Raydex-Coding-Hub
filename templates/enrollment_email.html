@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .email-container {
+        background-color: #ffffff;
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .email-header {
+        text-align: center;
+        padding-bottom: 20px;
+      }
+      .email-header img {
+        width: 150px;
+        height: auto;
+      }
+      .email-body {
+        color: #333333;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .email-body h1 {
+        color: #27ae60; /* Green success color */
+      }
+      .email-body p {
+        margin: 0 0 15px;
+      }
+      .email-footer {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 12px;
+        color: #777777;
+      }
+      .cta-button {
+        display: inline-block;
+        padding: 12px 25px;
+        background-color: #27ae60;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 20px;
+      }
+      .cta-button:hover {
+        background-color: #2ecc71;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <!-- Header section with logo -->
+      <div class="email-header">
+        <img src="https://raydexhub.com/img/bg.png" alt="Raydex Hub Logo" />
+      </div>
+
+      <!-- Main body content -->
+      <div class="email-body">
+        <h1>Welcome to {{ course.title }}!</h1>
+        <p>Dear {{ user.username }},</p>
+        <p>
+          Congratulations! You have successfully enrolled in the course:
+          <strong>{{ course.title }}</strong>.
+        </p>
+        <p>Course Description: {{ course.description }}</p>
+        <p>
+          We are excited to have you in this course and hope you will enjoy
+          learning with us. Please log in to your Raydex Hub account to start
+          accessing course materials, track your progress, and engage in
+          interactive quizzes and assignments.
+        </p>
+        <p>
+          Should you need any assistance, feel free to contact our support team,
+          and we will be happy to help.
+        </p>
+
+        <!-- CTA Button to take them directly to their account -->
+        <a href="https://raydexhub.com/login" class="cta-button"
+          >Start Learning</a
+        >
+      </div>
+
+      <!-- Footer section -->
+      <div class="email-footer">
+        <p>Best regards,</p>
+        <p>The Raydex Hub Team</p>
+        <p>
+          Follow us on:
+          <a href="https://twitter.com/raydexhub" style="color: #27ae60"
+            >Twitter</a
+          >
+          |
+          <a href="https://facebook.com/raydexhub" style="color: #27ae60"
+            >Facebook</a
+          >
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

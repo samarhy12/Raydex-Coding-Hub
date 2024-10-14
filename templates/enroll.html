@@ -1,0 +1,124 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-5">
+  <h2>Enroll in {{ course.title }}</h2>
+  <p>Course Price: {{ course.price }} GHS</p>
+  <form id="paymentForm">
+    <div class="form-group">
+      <label for="email-address">Email Address</label>
+      <input
+        type="email"
+        id="email-address"
+        value="{{ current_user.email }}"
+        required
+        readonly
+      />
+    </div>
+    <div class="form-group">
+      <label for="amount">Amount (GHS)</label>
+      <input
+        type="number"
+        id="amount"
+        value="{{ course.price }}"
+        required
+        readonly
+      />
+    </div>
+    <div class="form-group">
+      <label for="first-name">First Name</label>
+      <input
+        type="text"
+        id="first-name"
+        value="{{ current_user.username.split()[0] }}"
+        required
+        readonly
+      />
+    </div>
+    <div class="form-group">
+      <label for="last-name">Last Name</label>
+      <input
+        type="text"
+        id="last-name"
+        value="{{ current_user.username.split()[-1] }}"
+        required
+        readonly
+      />
+    </div>
+    <div class="form-submit">
+      <button type="button" id="payButton">Pay</button>
+    </div>
+  </form>
+  <div id="paymentResponse"></div>
+</div>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const payButton = document.getElementById("payButton");
+    payButton.addEventListener("click", payWithPaystack, false);
+  });
+
+  function payWithPaystack(e) {
+    e.preventDefault();
+
+    let handler = PaystackPop.setup({
+      key: "pk_test_de43b037d93eee9a134a3fe2b2d0e4b30c53b2ea", // Replace with your PUBLIC key
+      email: document.getElementById("email-address").value,
+      amount: document.getElementById("amount").value * 100,
+      currency: "GHS",
+      ref: "" + Math.floor(Math.random() * 1000000000 + 1),
+      callback: function (response) {
+        var reference = response.reference;
+        console.log("Payment complete! Reference: " + reference);
+        verifyPayment(reference);
+      },
+      onClose: function () {
+        console.log("Transaction was not completed, window closed.");
+      },
+    });
+    handler.openIframe();
+  }
+
+  function verifyPayment(reference) {
+    const courseId = getCourseId();
+    fetch(`/course/${courseId}/enroll`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `payment_reference=${reference}`,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.success) {
+          document.getElementById("paymentResponse").innerHTML =
+            '<p class="alert alert-success">Enrollment successful! Redirecting...</p>';
+          setTimeout(() => {
+            window.location.href = data.redirect_url;
+          }, 2000);
+        } else {
+          document.getElementById(
+            "paymentResponse"
+          ).innerHTML = `<p class="alert alert-danger">${data.message}</p>`;
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        document.getElementById("paymentResponse").innerHTML =
+          '<p class="alert alert-danger">An error occurred. Please try again or contact support.</p>';
+      });
+  }
+
+  function getCourseId() {
+    const pathParts = window.location.pathname.split("/");
+    return pathParts[pathParts.indexOf("course") + 1];
+  }
+
+  function getCsrfToken() {
+    return document.querySelector('input[name="csrf_token"]').value;
+  }
+</script>
+{% endblock %}

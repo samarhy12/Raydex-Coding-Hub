@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, redirect, url_for, flash, request, abort
+from flask import Flask, render_template, redirect, url_for, flash, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -17,6 +17,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from functools import wraps
 from dotenv import load_dotenv
+import requests
 
 # Initialize the app
 app = Flask(__name__)
@@ -37,6 +38,8 @@ app.config['MAIL_DEBUG'] = True
 app.config['CLOUDINARY_CLOUD_NAME'] = os.getenv('CLOUDINARY_CLOUD_NAME')
 app.config['CLOUDINARY_API_KEY'] = os.getenv('CLOUDINARY_API_KEY')
 app.config['CLOUDINARY_API_SECRET'] = os.getenv('CLOUDINARY_API_SECRET')
+
+PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
 
 mail = Mail(app)
 # Initialize Cloudinary
@@ -296,36 +299,68 @@ def course(course_id):
         next_lesson=next_lesson
     )
 
+def verify_paystack_transaction(reference):
+    url = f"https://api.paystack.co/transaction/verify/{reference}"
+    headers = {
+        "Authorization": f"Bearer {PAYSTACK_SECRET_KEY}",
+        "Content-Type": "application/json"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        response_data = response.json()
+        return response_data['status'], response_data['data']
+    return False, None
 
-@app.route('/course/<int:course_id>/enroll', methods=['POST'])
+@app.route('/course/<int:course_id>/enroll', methods=['GET', 'POST'])
 @login_required
 def enroll(course_id):
+    course = Course.query.get_or_404(course_id)
+    
     # Check if user is already enrolled
     if Enrollment.query.filter_by(user_id=current_user.id, course_id=course_id).first():
-        flash('You are already enrolled in this course.', 'info')
-        return redirect(url_for('course', course_id=course_id))
+        return jsonify({"success": False, "message": "Already enrolled"}), 400
 
-    # Enroll user in the course
-    enrollment = Enrollment(user_id=current_user.id, course_id=course_id)
-    db.session.add(enrollment)
-    db.session.commit()
+    if request.method == 'POST':
+        # Handle the payment confirmation
+        payment_reference = request.form.get('payment_reference')
+        print(payment_reference)
+        
+        if not payment_reference:
+            return jsonify({"success": False, "message": "No payment reference provided"}), 400
 
-    # Fetch the course details
-    course = Course.query.get_or_404(course_id)
+        # Verify the payment with Paystack
+        is_verified, transaction_data = verify_paystack_transaction(payment_reference)
+        
+        if is_verified:
+            # Check if the amount paid matches the course price
+            amount_paid = transaction_data['amount'] / 100  # Paystack amount is in kobo
+            if amount_paid != course.price:
+                return jsonify({"success": False, "message": "Payment amount does not match course price"}), 400
 
-    # Send enrollment email with a professional message
-    send_email(
-        subject=f'Course Enrollment Confirmation: {course.title}',
-        recipient=current_user.email,
-        template='enrollment_email',
-        user=current_user,
-        course=course
-    )
+            # Enroll user in the course
+            enrollment = Enrollment(user_id=current_user.id, course_id=course_id)
+            db.session.add(enrollment)
+            db.session.commit()
 
-    # Flash success message
-    flash('You have been enrolled in the course! A confirmation email has been sent to your inbox.', 'success')
-    return redirect(url_for('course', course_id=course_id))
+            # Send enrollment email
+            send_email(
+                subject=f'Course Enrollment Confirmation: {course.title}',
+                recipient=current_user.email,
+                template='enrollment_email',
+                user=current_user,
+                course=course
+            )
 
+            return jsonify({
+                "success": True, 
+                "message": "Enrollment successful",
+                "redirect_url": url_for('course', course_id=course_id)
+            }), 200
+        else:
+            return jsonify({"success": False, "message": "Payment verification failed"}), 400
+
+    # If it's a GET request, show the payment form
+    return render_template('enroll.html', course=course)
 
 # Lesson Route
 # Route to mark lesson as completed

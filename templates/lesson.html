@@ -1,142 +1,483 @@
-{% extends "base.html" %} {% block content %}
-<div class="container-fluid">
-  <div class="row">
-    <!-- Video Player Column -->
-    <div class="col-lg-8 p-0">
-      <div class="video-container bg-dark">
-        <div id="videoPlayer" class="embed-responsive embed-responsive-16by9">
-          <video id="currentVideo" class="embed-responsive-item" controls>
-            <source src="{{ videos[0].url }}" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Lesson Page</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <style>
+      /* Reset and base styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6;
+        color: #1f2937;
+        line-height: 1.5;
+      }
+
+      /* Layout */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+      }
+
+      /* Video player styles */
+      .video-container {
+        background-color: #000;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .video-player {
+        position: relative;
+        padding-top: 56.25%; /* 16:9 aspect ratio */
+      }
+
+      .video-player video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Video info and controls */
+      .video-info {
+        background-color: #fff;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .video-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+
+      .video-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .btn {
+        background-color: #10b981;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn:hover {
+        background-color: #059669;
+      }
+
+      .btn:disabled {
+        background-color: #9ca3af;
+        cursor: not-allowed;
+      }
+
+      /* Sidebar styles */
+      .sidebar {
+        background-color: #fff;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+      }
+
+      .sidebar h3 {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+
+      .video-list {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .video-list-item {
+        background-color: #f3f4f6;
+        padding: 0.75rem;
+        border-radius: 0.25rem;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .video-list-item:hover {
+        background-color: #d1fae5;
+      }
+
+      .video-list-item h5 {
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .video-list-item p {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin: 0.25rem 0 0;
+      }
+
+      /* Quiz and Assignment links */
+      .sidebar-link {
+        display: block;
+        background-color: #d1fae5;
+        color: #065f46;
+        padding: 0.75rem;
+        border-radius: 0.25rem;
+        margin-top: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+      }
+
+      .sidebar-link:hover {
+        background-color: #a7f3d0;
+      }
+
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .modal-title {
+        margin-top: 0;
+        color: #10b981;
+      }
+
+      .modal-body {
+        margin-top: 1rem;
+      }
+
+      /* Quiz specific styles */
+      .quiz-question {
+        margin-bottom: 1rem;
+      }
+
+      .quiz-options {
+        list-style-type: none;
+        padding-left: 0;
+      }
+
+      .quiz-option {
+        margin-bottom: 0.5rem;
+      }
+
+      /* Assignment specific styles */
+      .assignment-description {
+        margin-bottom: 1rem;
+      }
+
+      .assignment-submission {
+        margin-top: 1rem;
+      }
+
+      .assignment-submission textarea {
+        width: 100%;
+        min-height: 100px;
+        margin-bottom: 1rem;
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.25rem;
+      }
+
+      /* Responsive design */
+      @media (min-width: 1024px) {
+        .container {
+          display: flex;
+          gap: 2rem;
+        }
+
+        .main-content {
+          flex: 2;
+        }
+
+        .sidebar {
+          flex: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {% extends "base.html" %} {% block content %}
+    <div class="container">
+      <div class="main-content">
+        <div class="video-container">
+          <div class="video-player">
+            <video id="currentVideo" controls>
+              <source src="{{ videos[0].url }}" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+        <div class="video-info">
+          <h2 id="currentVideoTitle" class="video-title">
+            {{ videos[0].title }}
+          </h2>
+          <div class="video-controls">
+            <div>
+              <button id="prevVideo" class="btn" {% if not videos|length>
+                1 %}disabled{% endif %}>
+                <i class="fas fa-step-backward mr-2"></i>Previous
+              </button>
+              <button id="nextVideo" class="btn" {% if not videos|length>
+                1 %}disabled{% endif %}> Next<i
+                  class="fas fa-step-forward ml-2"
+                ></i>
+              </button>
+            </div>
+            {% if not completed %}
+            <form
+              action="{{ url_for('mark_completed', course_id=lesson.course_id, lesson_id=lesson.id) }}"
+              method="post"
+            >
+              <button type="submit" class="btn">Mark as Completed</button>
+            </form>
+            {% else %}
+            <span class="text-green-500 font-semibold"
+              ><i class="fas fa-check-circle mr-2"></i>Completed</span
+            >
+            {% endif %}
+          </div>
         </div>
       </div>
-      <div class="bg-light p-3">
-        <h2 id="currentVideoTitle">{{ videos[0].title }}</h2>
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <button
-              class="btn btn-primary"
-              id="prevVideo"
-              {%
-              if
-              not
-              videos|length
-            >
-              1 %}disabled{% endif %}>Previous
-            </button>
-            <button
-              class="btn btn-primary"
-              id="nextVideo"
-              {%
-              if
-              not
-              videos|length
-            >
-              1 %}disabled{% endif %}>Next
-            </button>
-          </div>
-          {% if not completed %}
-          <form
-            action="{{ url_for('mark_completed', course_id=lesson.course_id, lesson_id=lesson.id) }}"
-            method="post"
+
+      <div class="sidebar">
+        <h3>{{ lesson.title }}</h3>
+        <div class="prose max-w-none mb-6">{{ lesson.content | safe }}</div>
+        <div class="video-list">
+          {% for video in videos %}
+          <div
+            class="video-list-item"
+            data-url="{{ video.url }}"
+            data-title="{{ video.title }}"
           >
-            <button type="submit" class="btn btn-success">
-              Mark as Completed
-            </button>
+            <h5>{{ video.title }}</h5>
+            <p>Video {{ loop.index }} / {{ videos|length }}</p>
+          </div>
+          {% endfor %}
+        </div>
+        {% if lesson.quiz %}
+        <a href="#quizModal" data-toggle="modal" class="sidebar-link">
+          <i class="fas fa-question-circle mr-2"></i>Quiz
+        </a>
+        {% endif %} {% if lesson.assignment %}
+        <a href="#assignmentModal" data-toggle="modal" class="sidebar-link">
+          <i class="fas fa-tasks mr-2"></i>Assignment
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div id="quizModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 class="modal-title">Lesson Quiz</h2>
+        <div class="modal-body">
+          {% if lesson.quiz %}
+          <form id="quizForm">
+            {% for question in lesson.quiz.questions %}
+            <div class="quiz-question">
+              <p><strong>{{ loop.index }}. {{ question.text }}</strong></p>
+              <ul class="quiz-options">
+                {% for option in question.options %}
+                <li class="quiz-option">
+                  <label>
+                    <input
+                      type="radio"
+                      name="question_{{ loop.parent.index }}"
+                      value="{{ loop.index }}"
+                    />
+                    {{ option }}
+                  </label>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn">Submit Quiz</button>
           </form>
           {% else %}
-          <span class="text-success">✓ Completed</span>
+          <p>No quiz available for this lesson.</p>
           {% endif %}
         </div>
       </div>
     </div>
 
-    <!-- Sidebar Column -->
-    <div
-      class="col-lg-4 bg-light p-0"
-      style="height: calc(100vh - 56px); overflow-y: auto"
-    >
-      <div class="p-3">
-        <h3>{{ lesson.title }}</h3>
-        <p>{{ lesson.content | safe }}</p>
-      </div>
-      <div class="list-group list-group-flush">
-        {% for video in videos %}
-        <a
-          href="#"
-          class="list-group-item list-group-item-action video-link"
-          data-url="{{ video.url }}"
-          data-title="{{ video.title }}"
-        >
-          <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">{{ video.title }}</h5>
-            <small>{{ loop.index }}/{{ videos|length }}</small>
+    <!-- Assignment Modal -->
+    <div id="assignmentModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 class="modal-title">Lesson Assignment</h2>
+        <div class="modal-body">
+          {% if lesson.assignment %}
+          <div class="assignment-description">
+            {{ lesson.assignment.description | safe }}
           </div>
-          <p class="mb-1">Video {{ loop.index }}</p>
-        </a>
-        {% endfor %} {% if lesson.quiz %}
-        <a
-          href="#quizModal"
-          data-toggle="modal"
-          class="list-group-item list-group-item-action"
-        >
-          <h5 class="mb-1">Quiz</h5>
-        </a>
-        {% endif %} {% if lesson.assignment %}
-        <a
-          href="#assignmentModal"
-          data-toggle="modal"
-          class="list-group-item list-group-item-action"
-        >
-          <h5 class="mb-1">Assignment</h5>
-        </a>
-        {% endif %}
+          <form id="assignmentForm" class="assignment-submission">
+            <textarea
+              name="assignment_submission"
+              placeholder="Enter your assignment submission here..."
+            ></textarea>
+            <button type="submit" class="btn">Submit Assignment</button>
+          </form>
+          {% else %}
+          <p>No assignment available for this lesson.</p>
+          {% endif %}
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- Quiz and Assignment Modals remain the same -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          let currentVideoIndex = 0;
+          const videos = {{ videos | tojson | safe }};
 
-<script>
-  $(document).ready(function() {
-      let currentVideoIndex = 0;
-      const videos = {{ videos | tojson | safe }};
+          function updateVideo(index) {
+              const videoPlayer = document.getElementById('currentVideo');
+              videoPlayer.src = videos[index].url;
+              videoPlayer.load();
+              document.getElementById('currentVideoTitle').textContent = videos[index].title;
+              currentVideoIndex = index;
+              updateNavigationButtons();
+          }
 
-      function updateVideo(index) {
-          const videoPlayer = document.getElementById('currentVideo');
-          videoPlayer.src = videos[index].url;
-          videoPlayer.load(); // Important: This reloads the video with the new source
-          $('#currentVideoTitle').text(videos[index].title);
-          currentVideoIndex = index;
+          function updateNavigationButtons() {
+              document.getElementById('prevVideo').disabled = currentVideoIndex === 0;
+              document.getElementById('nextVideo').disabled = currentVideoIndex === videos.length - 1;
+          }
+
+          document.querySelectorAll('.video-list-item').forEach((item, index) => {
+              item.addEventListener('click', function() {
+                  updateVideo(index);
+              });
+          });
+
+          document.getElementById('prevVideo').addEventListener('click', function() {
+              if (currentVideoIndex > 0) {
+                  updateVideo(currentVideoIndex - 1);
+              }
+          });
+
+          document.getElementById('nextVideo').addEventListener('click', function() {
+              if (currentVideoIndex < videos.length - 1) {
+                  updateVideo(currentVideoIndex + 1);
+              }
+          });
+
+          // Modal functionality
+          const modals = document.querySelectorAll('.modal');
+          const modalTriggers = document.querySelectorAll('[data-toggle="modal"]');
+          const closeBtns = document.querySelectorAll('.close');
+
+          modalTriggers.forEach(trigger => {
+              trigger.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  const modal = document.querySelector(trigger.getAttribute('href'));
+                  modal.style.display = 'block';
+              });
+          });
+
+          closeBtns.forEach(btn => {
+              btn.addEventListener('click', () => {
+                  btn.closest('.modal').style.display = 'none';
+              });
+          });
+
+          window.addEventListener('click', (e) => {
+              modals.forEach(modal => {
+                  if (e.target === modal) {
+                      modal.style.display = 'none';
+                  }
+              });
+          });
+
+          // Quiz submission
+          const quizForm = document.getElementById('quizForm');
+          if (quizForm) {
+              quizForm.addEventListener('submit', (e) => {
+                  e.preventDefault();
+                  // Here you would typically send the quiz answers to your server
+                  // For this example, we'll just log to the console
+                  console.log('Quiz submitted');
+                  alert('Quiz submitted successfully!');
+                  document.getElementById('quizModal').style.display = 'none';
+              });
+          }
+
+          // Assignment submission
+          const assignmentForm = document.getElementById('assignmentForm');
+          if (assignmentForm) {
+              assignmentForm.addEventListener('submit', (e) => {
+                  e.preventDefault();
+                  // Here you would typically send the assignment submission to your server
+                  // For this example, we'll just log to the console
+                  console.log('Assignment submitted');
+                  alert('Assignment submitted successfully!');
+                  document.getElementById('assignmentModal').style.display = 'none';
+              });
+          }
+
           updateNavigationButtons();
-      }
-
-      function updateNavigationButtons() {
-          $('#prevVideo').prop('disabled', currentVideoIndex === 0);
-          $('#nextVideo').prop('disabled', currentVideoIndex === videos.length - 1);
-      }
-
-      $('.video-link').click(function(e) {
-          e.preventDefault();
-          const index = $(this).index('.video-link');
-          updateVideo(index);
       });
-
-      $('#prevVideo').click(function() {
-          if (currentVideoIndex > 0) {
-              updateVideo(currentVideoIndex - 1);
-          }
-      });
-
-      $('#nextVideo').click(function() {
-          if (currentVideoIndex < videos.length - 1) {
-              updateVideo(currentVideoIndex + 1);
-          }
-      });
-
-      updateNavigationButtons();
-  });
-</script>
-{% endblock %}
+    </script>
+    {% endblock %}
+  </body>
+</html>

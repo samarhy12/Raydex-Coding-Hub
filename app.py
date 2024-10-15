@@ -360,7 +360,7 @@ def enroll(course_id):
             return jsonify({"success": False, "message": "Payment verification failed"}), 400
 
     # If it's a GET request, show the payment form
-    return render_template('enroll.html', course=course)
+    return render_template('enroll.html', course=course, user=current_user)
 
 # Lesson Route
 # Route to mark lesson as completed

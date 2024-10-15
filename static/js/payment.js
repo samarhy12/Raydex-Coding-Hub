@@ -1,5 +1,3 @@
-alert("clicked");
-
 document.addEventListener("DOMContentLoaded", function () {
   const payButton = document.getElementById("payButton");
   payButton.addEventListener("click", payWithPaystack, false);
@@ -7,9 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function payWithPaystack(e) {
   e.preventDefault();
-
   let handler = PaystackPop.setup({
-    key: "sk_test_3ebe60ca67b7a1e7f59d531e0611f0ff4dbbfa4c", // Replace with your PUBLIC key
+    key: "pk_test_de43b037d93eee9a134a3fe2b2d0e4b30c53b2ea", // Replace with your PUBLIC key
     email: document.getElementById("email-address").value,
     amount: document.getElementById("amount").value * 100,
     currency: "GHS",
@@ -28,11 +25,12 @@ function payWithPaystack(e) {
 
 function verifyPayment(reference) {
   const courseId = getCourseId();
+  console.log("Verifying payment with reference: " + reference); // Log reference
+
   fetch(`/course/${courseId}/enroll`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-      "X-CSRFToken": getCsrfToken(),
     },
     body: `payment_reference=${reference}`,
   })
@@ -65,8 +63,4 @@ function verifyPayment(reference) {
 function getCourseId() {
   const pathParts = window.location.pathname.split("/");
   return pathParts[pathParts.indexOf("course") + 1];
-}
-
-function getCsrfToken() {
-  return document.querySelector('input[name="csrf_token"]').value;
 }

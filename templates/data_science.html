@@ -1,0 +1,176 @@
+{% extends 'base.html' %} {% block title %}Raydex Coding Hub - Data Science{%
+endblock %} {% block content %}
+<style>
+  .fade-in {
+    opacity: 0;
+    animation: fadeIn 1s ease-in forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .stats-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .stats-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .tool-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #4a90e2;
+  }
+
+  .career-path {
+    position: relative;
+    padding: 2rem;
+    margin: 2rem 0;
+    border-left: 3px solid #4a90e2;
+  }
+
+  .career-path::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    top: 0;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #4a90e2;
+  }
+</style>
+
+<section
+  class="hero bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20"
+>
+  <div class="container mx-auto text-center">
+    <h1 class="text-4xl font-bold mb-6 fade-in">Discover Data Science</h1>
+    <p class="text-xl mb-8 fade-in" style="animation-delay: 0.2s">
+      Transform raw data into meaningful insights and drive decision-making
+    </p>
+  </div>
+</section>
+
+<section class="container mx-auto py-16">
+  <h2 class="text-3xl font-bold mb-12 text-center fade-in">
+    Why Data Science?
+  </h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="stats-card fade-in" style="animation-delay: 0.3s">
+      <div class="tool-icon">📈</div>
+      <h3 class="text-xl font-bold mb-4">High Demand</h3>
+      <p>Data Science jobs are projected to grow by 36% through 2031</p>
+    </div>
+
+    <div class="stats-card fade-in" style="animation-delay: 0.4s">
+      <div class="tool-icon">💰</div>
+      <h3 class="text-xl font-bold mb-4">Competitive Salary</h3>
+      <p>Average salary of $100,000+ for experienced data scientists</p>
+    </div>
+
+    <div class="stats-card fade-in" style="animation-delay: 0.5s">
+      <div class="tool-icon">🌍</div>
+      <h3 class="text-xl font-bold mb-4">Global Impact</h3>
+      <p>Shape the future of AI, healthcare, finance, and more</p>
+    </div>
+  </div>
+</section>
+
+<section class="bg-gray-50 py-16">
+  <div class="container mx-auto">
+    <h2 class="text-3xl font-bold mb-12 text-center">Career Path</h2>
+
+    <div class="max-w-3xl mx-auto">
+      <div class="career-path fade-in" style="animation-delay: 0.6s">
+        <h3 class="text-xl font-bold">Data Analyst</h3>
+        <p>Master data visualization and basic statistical analysis</p>
+      </div>
+
+      <div class="career-path fade-in" style="animation-delay: 0.7s">
+        <h3 class="text-xl font-bold">Junior Data Scientist</h3>
+        <p>Build predictive models and work with machine learning algorithms</p>
+      </div>
+
+      <div class="career-path fade-in" style="animation-delay: 0.8s">
+        <h3 class="text-xl font-bold">Senior Data Scientist</h3>
+        <p>Lead complex projects and develop innovative solutions</p>
+      </div>
+
+      <div class="career-path fade-in" style="animation-delay: 0.9s">
+        <h3 class="text-xl font-bold">Lead Data Scientist</h3>
+        <p>Guide team strategy and drive organizational data initiatives</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container mx-auto py-16">
+  <h2 class="text-3xl font-bold mb-12 text-center">Essential Tools</h2>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+    <div class="text-center fade-in" style="animation-delay: 1s">
+      <img
+        src="/api/placeholder/100/100"
+        alt="Python"
+        class="mx-auto mb-4 rounded-full"
+      />
+      <h3 class="font-bold">Python</h3>
+    </div>
+
+    <div class="text-center fade-in" style="animation-delay: 1.1s">
+      <img
+        src="/api/placeholder/100/100"
+        alt="R"
+        class="mx-auto mb-4 rounded-full"
+      />
+      <h3 class="font-bold">R</h3>
+    </div>
+
+    <div class="text-center fade-in" style="animation-delay: 1.2s">
+      <img
+        src="/api/placeholder/100/100"
+        alt="SQL"
+        class="mx-auto mb-4 rounded-full"
+      />
+      <h3 class="font-bold">SQL</h3>
+    </div>
+
+    <div class="text-center fade-in" style="animation-delay: 1.3s">
+      <img
+        src="/api/placeholder/100/100"
+        alt="Tensorflow"
+        class="mx-auto mb-4 rounded-full"
+      />
+      <h3 class="font-bold">Tensorflow</h3>
+    </div>
+  </div>
+</section>
+
+<div class="cta bg-blue-600 text-white py-16 text-center">
+  <h2 class="text-3xl font-bold mb-6">Start Your Data Science Journey</h2>
+  <p class="mb-8">
+    Join our comprehensive data science program and become an expert
+  </p>
+  <a
+    href="/register"
+    class="bg-white text-blue-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition duration-300"
+  >
+    Enroll Now
+  </a>
+</div>
+{% endblock %}

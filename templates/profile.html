@@ -1,0 +1,81 @@
+{% extends "base.html" %} {% block content %}
+<div class="container my-5">
+  <h2 class="text-center mb-4">Profile Settings</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-body">
+          <div class="text-center mb-4">
+            <img
+              src="https://ui-avatars.com/api/?name={{ current_user.username }}&background=2ecc71&color=fff"
+              alt="Profile"
+              class="rounded-circle me-2"
+              style="width: 32px; height: 32px"
+            />
+            <div class="mt-3">
+              <a
+                for="profile_picture"
+                href="/dashboard"
+                class="btn btn-outline-primary"
+                >Go back to dashboard</a
+              >
+            </div>
+          </div>
+          <form method="POST">
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                name="username"
+                value="{{ current_user.username }}"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                value="{{ current_user.email }}"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              Update Profile
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document
+    .getElementById("profile_picture")
+    .addEventListener("change", function () {
+      var formData = new FormData();
+      formData.append("profile_picture", this.files[0]);
+
+      fetch('{{ url_for("update_profile_picture") }}', {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            location.reload();
+          } else {
+            alert("Error uploading file: " + data.error);
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    });
+</script>
+{% endblock %}

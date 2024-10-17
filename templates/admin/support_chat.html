@@ -1,0 +1,107 @@
+{% extends "base.html" %} {% block content %}
+<div class="container-fluid mt-5">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h4>Active Chats</h4>
+        </div>
+        <div class="card-body">
+          <ul id="active-chats" class="list-group">
+            {% for username, room in active_chats.items() %}
+            <li class="list-group-item">{{ username }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h3>Admin Support Chat</h3>
+        </div>
+        <div class="card-body">
+          <div
+            id="chat-messages"
+            class="mb-3"
+            style="height: 400px; overflow-y: auto"
+          >
+            <!-- Chat messages will be appended here -->
+          </div>
+          <div class="input-group">
+            <input
+              type="text"
+              id="chat-input"
+              class="form-control"
+              placeholder="Type your message..."
+            />
+            <div class="input-group-append">
+              <button class="btn btn-primary" onclick="sendMessage()">
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+  var socket = io();
+
+  socket.on("connect", function () {
+    socket.emit("join", {});
+    addMessage("System", "Connected to admin support chat.");
+  });
+
+  socket.on("status", function (data) {
+    addMessage("System", data.msg);
+    updateActiveChats(data.activeChats); // Pass active chats data from the server
+  });
+
+  socket.on("message", function (data) {
+    addMessage(data.username, data.msg);
+  });
+
+  function sendMessage() {
+    var input = document.getElementById("chat-input");
+    var message = input.value.trim();
+    if (message) {
+      socket.emit("message", { msg: message });
+      input.value = "";
+    }
+  }
+
+  function addMessage(username, message) {
+    var chatMessages = document.getElementById("chat-messages");
+    var messageDiv = document.createElement("div");
+    messageDiv.className = "mb-2";
+    messageDiv.innerHTML = "<strong>" + username + ":</strong> " + message;
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function updateActiveChats(activeChats) {
+    var activeChatsContainer = document.getElementById("active-chats");
+    activeChatsContainer.innerHTML = ""; // Clear current list
+
+    activeChats.forEach(function (chat) {
+      var chatItem = document.createElement("div");
+      chatItem.className = "chat-item";
+      chatItem.innerText = chat.username + " (" + chat.status + ")";
+      activeChatsContainer.appendChild(chatItem);
+    });
+  }
+
+  // Allow sending message with Enter key
+  document
+    .getElementById("chat-input")
+    .addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
+</script>
+{% endblock %}

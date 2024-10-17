@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Explore Machine Learning - Raydex Coding Hub</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+      .container {
+        width: 80%;
+        margin: auto;
+        overflow: hidden;
+        padding: 20px;
+      }
+      header {
+        background: #3498db;
+        color: white;
+        padding-top: 30px;
+        min-height: 70px;
+        border-bottom: #2980b9 3px solid;
+      }
+      header h1 {
+        margin: 0;
+        text-align: center;
+        padding-bottom: 20px;
+      }
+      .animation-container {
+        height: 300px;
+        background-color: #ecf0f1;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+      .node {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #3498db;
+        position: absolute;
+      }
+      .connection {
+        height: 2px;
+        background-color: #2c3e50;
+        position: absolute;
+        transform-origin: left center;
+      }
+      section {
+        margin-bottom: 20px;
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        color: #2c3e50;
+      }
+      .cta-button {
+        display: inline-block;
+        background: #3498db;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background 0.3s ease;
+      }
+      .cta-button:hover {
+        background: #2980b9;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Explore Machine Learning</h1>
+    </header>
+
+    <div class="container">
+      <div class="animation-container" id="animationContainer"></div>
+
+      <section>
+        <h2>What is Machine Learning?</h2>
+        <p>
+          Machine Learning is a subset of artificial intelligence that focuses
+          on the development of algorithms and statistical models that enable
+          computer systems to improve their performance on a specific task
+          through experience.
+        </p>
+      </section>
+
+      <section>
+        <h2>Key Concepts in Machine Learning</h2>
+        <ul>
+          <li>Supervised Learning</li>
+          <li>Unsupervised Learning</li>
+          <li>Reinforcement Learning</li>
+          <li>Deep Learning</li>
+          <li>Neural Networks</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Applications of Machine Learning</h2>
+        <p>
+          Machine Learning has a wide range of applications across various
+          industries, including:
+        </p>
+        <ul>
+          <li>Image and Speech Recognition</li>
+          <li>Natural Language Processing</li>
+          <li>Predictive Analytics</li>
+          <li>Autonomous Vehicles</li>
+          <li>Recommendation Systems</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Start Your Machine Learning Journey</h2>
+        <p>
+          Ready to dive into the exciting world of Machine Learning? Explore our
+          courses and start building intelligent systems today!
+        </p>
+        <a href="#" class="cta-button">View Machine Learning Courses</a>
+      </section>
+    </div>
+
+    <script>
+      // Create nodes and connections
+      const container = document.getElementById("animationContainer");
+      const nodeCount = 10;
+      const nodes = [];
+      const connections = [];
+
+      for (let i = 0; i < nodeCount; i++) {
+        const node = document.createElement("div");
+        node.className = "node";
+        container.appendChild(node);
+        nodes.push(node);
+      }
+
+      for (let i = 0; i < nodeCount - 1; i++) {
+        const connection = document.createElement("div");
+        connection.className = "connection";
+        container.appendChild(connection);
+        connections.push(connection);
+      }
+
+      // Animate nodes and connections
+      function animateNetwork() {
+        gsap.to(nodes, {
+          duration: 2,
+          x: () => Math.random() * container.offsetWidth,
+          y: () => Math.random() * container.offsetHeight,
+          ease: "power1.inOut",
+          repeat: -1,
+          yoyo: true,
+          onUpdate: updateConnections,
+        });
+      }
+
+      function updateConnections() {
+        connections.forEach((connection, index) => {
+          const startNode = nodes[index];
+          const endNode = nodes[index + 1];
+          const startX = startNode.offsetLeft + startNode.offsetWidth / 2;
+          const startY = startNode.offsetTop + startNode.offsetHeight / 2;
+          const endX = endNode.offsetLeft + endNode.offsetWidth / 2;
+          const endY = endNode.offsetTop + endNode.offsetHeight / 2;
+          const length = Math.sqrt(
+            Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)
+          );
+          const angle =
+            (Math.atan2(endY - startY, endX - startX) * 180) / Math.PI;
+
+          gsap.set(connection, {
+            width: length,
+            x: startX,
+            y: startY,
+            rotation: angle,
+          });
+        });
+      }
+
+      animateNetwork();
+    </script>
+  </body>
+</html>

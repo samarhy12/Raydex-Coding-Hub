@@ -1,0 +1,192 @@
+{% extends 'base.html' %} {% block title %}Raydex Coding Hub - Mobile
+Development{% endblock %} {% block content %}
+<style>
+  .fade-in {
+    opacity: 0;
+    animation: fadeIn 1s ease-in forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .phone-demo {
+    position: relative;
+    width: 280px;
+    height: 560px;
+    margin: 2rem auto;
+    border: 12px solid #333;
+    border-radius: 36px;
+    overflow: hidden;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  .platform-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .platform-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+  }
+</style>
+
+<section
+  class="hero bg-gradient-to-r from-green-500 to-blue-500 text-white py-20"
+>
+  <div class="container mx-auto text-center">
+    <h1 class="text-4xl font-bold mb-6 fade-in">Mobile Development</h1>
+    <p class="text-xl mb-8 fade-in" style="animation-delay: 0.2s">
+      Create amazing apps that millions of people can use every day
+    </p>
+
+    <div class="phone-demo bg-white">
+      <img src="/api/placeholder/280/560" alt="Mobile App Demo" />
+    </div>
+  </div>
+</section>
+
+<section class="container mx-auto py-16">
+  <h2 class="text-3xl font-bold mb-12 text-center">Development Platforms</h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="platform-card fade-in" style="animation-delay: 0.3s">
+      <img
+        src="/api/placeholder/100/100"
+        alt="iOS Development"
+        class="mb-4 rounded-lg"
+      />
+      <h3 class="text-xl font-bold mb-4">iOS Development</h3>
+      <ul class="space-y-2">
+        <li>• Swift programming language</li>
+        <li>• XCode IDE</li>
+        <li>• Interface Builder</li>
+        <li>• iOS Frameworks</li>
+      </ul>
+    </div>
+
+    <div class="platform-card fade-in" style="animation-delay: 0.4s">
+      <img
+        src="/api/placeholder/100/100"
+        alt="Android Development"
+        class="mb-4 rounded-lg"
+      />
+      <h3 class="text-xl font-bold mb-4">Android Development</h3>
+      <ul class="space-y-2">
+        <li>• Kotlin programming language</li>
+        <li>• Android Studio</li>
+        <li>• Material Design</li>
+        <li>• Android SDK</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="bg-gray-50 py-16">
+  <div class="container mx-auto">
+    <h2 class="text-3xl font-bold mb-12 text-center">
+      Key Skills You'll Learn
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="text-center fade-in" style="animation-delay: 0.5s">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <i class="fas fa-mobile-alt text-4xl text-green-500 mb-4"></i>
+          <h3 class="font-bold mb-2">UI/UX Design</h3>
+          <p>Create beautiful and intuitive user interfaces</p>
+        </div>
+      </div>
+
+      <div class="text-center fade-in" style="animation-delay: 0.6s">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <i class="fas fa-database text-4xl text-blue-500 mb-4"></i>
+          <h3 class="font-bold mb-2">Data Management</h3>
+          <p>Handle local and remote data efficiently</p>
+        </div>
+      </div>
+
+      <div class="text-center fade-in" style="animation-delay: 0.7s">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <i class="fas fa-cloud text-4xl text-purple-500 mb-4"></i>
+          <h3 class="font-bold mb-2">API Integration</h3>
+          <p>Connect your app to web services</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container mx-auto py-16">
+  <h2 class="text-3xl font-bold mb-12 text-center">Career Opportunities</h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div
+      class="bg-white p-6 rounded-lg shadow-md fade-in"
+      style="animation-delay: 0.8s"
+    >
+      <h3 class="font-bold mb-2">Mobile App Developer</h3>
+      <p>Average Salary: $95,000</p>
+    </div>
+
+    <div
+      class="bg-white p-6 rounded-lg shadow-md fade-in"
+      style="animation-delay: 0.9s"
+    >
+      <h3 class="font-bold mb-2">Lead App Developer</h3>
+      <p>Average Salary: $120,000</p>
+    </div>
+
+    <div
+      class="bg-white p-6 rounded-lg shadow-md fade-in"
+      style="animation-delay: 1s"
+    >
+      <h3 class="font-bold mb-2">Mobile Architect</h3>
+      <p>Average Salary: $150,000</p>
+    </div>
+
+    <div
+      class="bg-white p-6 rounded-lg shadow-md fade-in"
+      style="animation-delay: 1.1s"
+    >
+      <h3 class="font-bold mb-2">App Entrepreneur</h3>
+      <p>Unlimited Potential</p>
+    </div>
+  </div>
+</section>
+
+<div class="cta bg-green-600 text-white py-16 text-center">
+  <h2 class="text-3xl font-bold mb-6">Ready to Build Your First App?</h2>
+  <p class="mb-8">
+    Join our mobile development program and bring your ideas to life
+  </p>
+  <a
+    href="/register"
+    class="bg-white text-green-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition duration-300"
+  >
+    Start Learning
+  </a>
+</div>
+{% endblock %}

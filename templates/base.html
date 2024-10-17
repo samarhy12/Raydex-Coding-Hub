@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}Raydex Coding Hub{% endblock %}</title>
+    <title>Raydex Coding Hub</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -14,33 +14,131 @@
     />
     <link
       rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
+      href="{{url_for('static', filename='css/style.css')}}"
     />
-    <!-- Option 1: Include in HTML -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
-    />
-    <link rel="manifest" href="{{ url_for('manifest') }}" />
+    <style>
+      :root {
+        --raydex-green: #2ecc71;
+        --raydex-dark-green: #27ae60;
+        --raydex-light-gray: #f8f9fa;
+        --raydex-dark-gray: #495057;
+      }
+
+      .navbar {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .navbar-brand img {
+        height: 40px;
+        transition: transform 0.3s ease;
+      }
+
+      .navbar-brand:hover img {
+        transform: scale(1.05);
+      }
+
+      .nav-link {
+        color: var(--raydex-dark-gray);
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        transition: color 0.2s ease, background-color 0.2s ease;
+        border-radius: 5px;
+      }
+
+      .nav-link:hover,
+      .nav-link:focus {
+        color: var(--raydex-green);
+        background-color: var(--raydex-light-gray);
+      }
+
+      .navbar-nav .dropdown-menu {
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      }
+
+      .dropdown-item {
+        padding: 0.5rem 1.5rem;
+        color: var(--raydex-dark-gray);
+        transition: color 0.2s ease, background-color 0.2s ease;
+      }
+
+      .dropdown-item:hover,
+      .dropdown-item:focus {
+        background-color: var(--raydex-light-gray);
+        color: var(--raydex-green);
+      }
+
+      .btn-login,
+      .btn-signup {
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .btn-login {
+        color: var(--raydex-green);
+        border: 1px solid var(--raydex-green);
+      }
+
+      .btn-login:hover {
+        background-color: var(--raydex-green);
+        color: white;
+      }
+
+      .btn-signup {
+        background-color: var(--raydex-green);
+        color: white;
+      }
+
+      .btn-signup:hover {
+        background-color: var(--raydex-dark-green);
+      }
+
+      .user-dropdown img {
+        width: 32px;
+        height: 32px;
+        object-fit: cover;
+      }
+
+      @media (max-width: 991.98px) {
+        .navbar-collapse {
+          background-color: white;
+          padding: 1rem;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-nav {
+          margin-bottom: 1rem;
+        }
+
+        .nav-item {
+          margin-bottom: 0.5rem;
+        }
+
+        .btn-login,
+        .btn-signup {
+          display: block;
+          width: 100%;
+          margin-bottom: 0.5rem;
+        }
+
+        .user-dropdown {
+          text-align: center;
+        }
+      }
+    </style>
   </head>
   <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
-      <div class="container-fluid">
-        <!-- Brand on the left -->
-        <a
-          class="navbar-brand d-flex align-items-center"
-          href="{{ url_for('home') }}"
-        >
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+      <div class="container">
+        <a class="navbar-brand" href="{{ url_for('home') }}">
           <img
             src="{{ url_for('static', filename='images/bg.png') }}"
             alt="Raydex logo"
             class="me-2"
-            style="height: 40px"
           />
         </a>
-
-        <!-- Hamburger menu for mobile -->
         <button
           class="navbar-toggler"
           type="button"
@@ -52,13 +150,8 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
-
-        <!-- Navbar items, centered on desktop -->
-        <div
-          class="collapse navbar-collapse justify-content-center"
-          id="navbarNav"
-        >
-          <ul class="navbar-nav">
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav mx-auto">
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('courses') }}">Courses</a>
             </li>
@@ -90,164 +183,70 @@
             </li>
             {% endif %}
           </ul>
-        </div>
-
-        <div class="d-flex align-items-center">
-          <!-- Profile and login elements on the right -->
-          {% if current_user.is_authenticated and current_user.is_admin %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('admin_dashboard') }}"
+          <div class="d-flex align-items-center">
+            {% if current_user.is_authenticated %} {% if current_user.is_admin
+            %}
+            <a class="nav-link me-3" href="{{ url_for('admin_dashboard') }}"
               >Admin</a
             >
-          </li>
-          {% endif %} {% if current_user.is_authenticated %}
-          <div class="dropdown">
-            <a
-              class="nav-link dropdown-toggle d-flex align-items-center"
-              href="#"
-              id="userDropdown"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <img
-                src="https://ui-avatars.com/api/?name={{ current_user.username }}&background=2ecc71&color=fff"
-                alt="Profile"
-                class="rounded-circle me-2"
-                style="width: 32px; height: 32px"
-              />
-              <span class="d-none d-lg-inline"
-                >{{ current_user.username }}</span
+            {% endif %}
+            <div class="dropdown user-dropdown">
+              <a
+                class="nav-link dropdown-toggle d-flex align-items-center"
+                href="#"
+                id="userDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
               >
-            </a>
-            <ul
-              class="dropdown-menu dropdown-menu-end"
-              aria-labelledby="userDropdown"
+                <img
+                  src="https://ui-avatars.com/api/?name={{ current_user.username }}&background=2ecc71&color=fff"
+                  alt="Profile"
+                  class="rounded-circle me-2"
+                />
+                <span class="d-none d-lg-inline"
+                  >{{ current_user.username }}</span
+                >
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-end"
+                aria-labelledby="userDropdown"
+              >
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{{ url_for('student_dashboard') }}"
+                    >Dashboard</a
+                  >
+                </li>
+                <li><a class="dropdown-item" href="#">Account Settings</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="{{ url_for('logout') }}"
+                    >Sign Out</a
+                  >
+                </li>
+              </ul>
+            </div>
+            {% else %}
+            <a
+              href="{{ url_for('login') }}"
+              class="btn course-btn me-2"
+              style="border: 1px solid #2ecc71"
+              >Log In</a
             >
-              <li>
-                <a
-                  class="dropdown-item"
-                  href="{{ url_for('student_dashboard') }}"
-                  >Dashboard</a
-                >
-              </li>
-              <li><a class="dropdown-item" href="#">Account Settings</a></li>
-              <li><hr class="dropdown-divider" /></li>
-              <li>
-                <a class="dropdown-item" href="{{ url_for('logout') }}"
-                  >Sign Out</a
-                >
-              </li>
-            </ul>
+            <a
+              href="{{ url_for('register') }}"
+              class="btn course-btn"
+              style="color: white; background-color: #27ae60"
+              >Sign Up</a
+            >
+            {% endif %}
           </div>
-          {% else %}
-          <a
-            href="{{ url_for('login') }}"
-            class="btn course-btn me-2"
-            style="border: 1px solid #2ecc71"
-            >Log In</a
-          >
-          <a
-            href="{{ url_for('register') }}"
-            class="btn btn course-btn"
-            style="color: white; background-color: #27ae60"
-            >Sign Up</a
-          >
-          {% endif %}
         </div>
       </div>
     </nav>
 
-    <style>
-      :root {
-        --raydex-green: #2ecc71;
-        --raydex-dark-green: #27ae60;
-      }
-
-      .navbar {
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-      }
-
-      .navbar-brand {
-        padding-top: 0;
-        padding-bottom: 0;
-      }
-
-      .brand-text {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--raydex-green);
-      }
-
-      .nav-link {
-        color: #495057;
-        font-weight: 500;
-        padding: 0.5rem 1rem;
-        transition: color 0.15s ease-in-out;
-      }
-
-      .nav-link:hover,
-      .nav-link:focus {
-        color: var(--raydex-green);
-      }
-
-      .dropdown-menu {
-        border: none;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-      }
-
-      .dropdown-item {
-        padding: 0.5rem 1.5rem;
-        color: #495057;
-      }
-
-      .dropdown-item:hover,
-      .dropdown-item:focus {
-        background-color: #f8f9fa;
-        color: var(--raydex-green);
-      }
-
-      .btn-success {
-        background-color: var(--raydex-green);
-        border-color: var(--raydex-green);
-      }
-
-      .btn-success:hover,
-      .btn-success:focus {
-        background-color: var(--raydex-dark-green);
-        border-color: var(--raydex-dark-green);
-      }
-
-      .btn-outline-success {
-        color: var(--raydex-green);
-        border-color: var(--raydex-green);
-      }
-
-      .btn-outline-success:hover,
-      .btn-outline-success:focus {
-        background-color: var(--raydex-green);
-        border-color: var(--raydex-green);
-      }
-
-      @media (max-width: 991.98px) {
-        .navbar-nav {
-          text-align: center;
-        }
-        .nav-link {
-          padding: 0.5rem 0;
-        }
-        .d-flex.align-items-center {
-          margin-top: 1rem;
-          justify-content: center;
-        }
-        .dropdown,
-        .btn {
-          width: auto;
-          margin-bottom: 0.5rem;
-        }
-      }
-    </style>
     <div id="flash-messages"></div>
     <!-- Main content -->
     {% block content %}{% endblock %}

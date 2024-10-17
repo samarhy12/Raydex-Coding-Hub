@@ -1,0 +1,42 @@
+{% extends "base.html" %} {% block content %}
+<div class="container my-5">
+  <h2 class="text-center mb-4">Help Center</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Need Assistance?</h5>
+          <p class="card-text">
+            Our support team is here to help you with any questions or issues
+            you may have.
+          </p>
+          <a href="mailto:support@raydexhub.com" class="btn btn-primary"
+            >Contact Support</a
+          >
+        </div>
+      </div>
+      <div class="card shadow mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Frequently Asked Questions</h5>
+          <p class="card-text">
+            Find quick answers to common questions in our FAQ section.
+          </p>
+          <a href="{{ url_for('faq') }}" class="btn btn-outline-primary"
+            >View FAQs</a
+          >
+        </div>
+      </div>
+      <div class="card shadow">
+        <div class="card-body">
+          <h5 class="card-title">User Guides</h5>
+          <p class="card-text">
+            Learn how to make the most of our platform with our comprehensive
+            user guides.
+          </p>
+          <a href="#" class="btn btn-outline-primary">Browse Guides</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

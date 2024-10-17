@@ -18,6 +18,8 @@ from logging.handlers import RotatingFileHandler
 from functools import wraps
 from dotenv import load_dotenv
 import requests
+from werkzeug.utils import secure_filename
+from flask_socketio import SocketIO, emit, join_room, leave_room
 
 # Initialize the app
 app = Flask(__name__)
@@ -39,9 +41,15 @@ app.config['CLOUDINARY_CLOUD_NAME'] = os.getenv('CLOUDINARY_CLOUD_NAME')
 app.config['CLOUDINARY_API_KEY'] = os.getenv('CLOUDINARY_API_KEY')
 app.config['CLOUDINARY_API_SECRET'] = os.getenv('CLOUDINARY_API_SECRET')
 
+
 PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'profile_pics')
 
 mail = Mail(app)
+socketio = SocketIO(app)
+
+ADMIN_SUPPORT_ROOM = 'admin_support'
+active_chats = {}
 # Initialize Cloudinary
 import cloudinary
 cloudinary.config(
@@ -245,6 +253,10 @@ def get_cloudinary_video_url(public_id):
     except Exception as e:
         app.logger.error(f"Failed to get Cloudinary video URL: {e}")
         return None
+    
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
 
 # Load user
 @login_manager.user_loader
@@ -764,6 +776,123 @@ def make_admin(user_id):
     flash(f'{user.username} has been made an admin.', 'success')
     return redirect(url_for('admin_users'))
 
+@app.route('/account_settings', methods=['GET', 'POST'])
+@login_required
+def account_settings():
+    if request.method == 'POST':
+        # Handle form submission
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        if not bcrypt.check_password_hash(current_user.password, current_password):
+            flash('Current password is incorrect.', 'danger')
+        elif new_password != confirm_password:
+            flash('New passwords do not match.', 'danger')
+        else:
+            current_user.password = bcrypt.generate_password_hash(new_password)
+            db.session.commit()
+            flash('Password updated successfully.', 'success')
+
+    return render_template('account_settings.html')
+
+@app.route('/help_center')
+def help_center():
+    return render_template('help_center.html')
+
+@app.route('/faq')
+def faq():
+    faqs = [
+        {"question": "How do I enroll in a course?", "answer": "To enroll in a course, navigate to the course page and click the 'Enroll' button. Follow the prompts to complete the enrollment process."},
+        {"question": "Can I access course materials after completing a course?", "answer": "Yes, you will have lifetime access to all course materials after completion."},
+        {"question": "How do I reset my password?", "answer": "You can reset your password by going to the Account Settings page and following the 'Change Password' instructions."},
+        {"question": "Are there any prerequisites for courses?", "answer": "Prerequisites, if any, are listed on each course's description page."},
+        {"question": "How can I contact support?", "answer": "You can contact our support team through the Help Center page or by emailing support@raydexhub.com."}
+    ]
+    return render_template('faq.html', faqs=faqs)
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if request.method == 'POST':
+        current_user.username = request.form['username']
+        current_user.email = request.form['email']
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('profile'))
+    return render_template('profile.html')
+
+@app.route('/update_profile_picture', methods=['POST'])
+@login_required
+def update_profile_picture():
+    if 'profile_picture' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['profile_picture']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+        current_user.profile_picture = filename
+        db.session.commit()
+        return jsonify({'success': True, 'filename': filename}), 200
+    return jsonify({'error': 'File type not allowed'}), 400
+
+@app.route('/web')
+def web_development():
+    return render_template('webdevelopment.html')
+
+# Route for machine learning page
+@app.route('/ml')
+def machine_learning():
+    return render_template('machine_learning.html')
+
+# Route for data science page
+@app.route('/data')
+def data_science():
+    return render_template('data_science.html')
+
+# Route for mobile development page
+@app.route('/mobile')
+def mobile_development():
+    return render_template('mobile_development.html')
+
+
+@app.route('/support_chat')
+@login_required
+def support_chat():
+    return render_template('support_chat.html')
+
+@socketio.on('join')
+def on_join(data):
+    username = current_user.username
+    room = ADMIN_SUPPORT_ROOM
+    join_room(room)
+    active_chats[username] = room
+    emit('status', {'msg': f'{username} has entered the room.'}, room=room)
+
+@socketio.on('leave')
+def on_leave(data):
+    username = current_user.username
+    room = ADMIN_SUPPORT_ROOM
+    leave_room(room)
+    del active_chats[username]
+    emit('status', {'msg': f'{username} has left the room.'}, room=room)
+
+@socketio.on('message')
+def handle_message(data):
+    username = current_user.username
+    room = ADMIN_SUPPORT_ROOM
+    emit('message', {'msg': data['msg'], 'username': username}, room=room)
+
+# Add this to your admin dashboard route
+@app.route('/admin/support_chat')
+@login_required
+@admin_required
+def admin_support_chat():
+    return render_template('admin/support_chat.html', active_chats=active_chats)
+
 # PWA Manifest
 @app.route('/manifest.json')
 def manifest():
@@ -789,4 +918,4 @@ def handle_csrf_error(e):
 
 # Run the app
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',port=5000, debug=True)
+    socketio.run(app, debug=True)

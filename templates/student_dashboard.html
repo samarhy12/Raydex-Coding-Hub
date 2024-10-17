@@ -25,13 +25,13 @@ Hub{% endblock %} {% block content %}
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="/profile">
               <i class="fas fa-user"></i> Profile Settings
             </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="/account_settings">
               <i class="fas fa-cog"></i> Account Settings
             </a>
           </li>
@@ -44,17 +44,17 @@ Hub{% endblock %} {% block content %}
         </h6>
         <ul class="nav flex-column mb-2">
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="{{ url_for('help_center')}}">
               <i class="fas fa-question-circle"></i> Help Center
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="{{ url_for('faq')}}">
               <i class="fas fa-info-circle"></i> FAQs
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="{{ url_for('support_chat') }}">
               <i class="fas fa-life-ring"></i> Support
             </a>
           </li>

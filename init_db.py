@@ -31,25 +31,25 @@ with app.app_context():
         {
             'title': 'Python for Beginners',
             'description': 'A complete course to learn Python programming from scratch.',
-            'price': 49.99,
+            'price': 149.99,
             'image': 'python.jpeg'
         },
         {
             'title': 'Web Development with Flask',
             'description': 'Learn to build web applications with Flask, a lightweight Python web framework.',
-            'price': 79.99,
+            'price': 149.99,
             'image': 'web.jpeg'
         },
         {
             'title': 'Data Science with Python',
             'description': 'Unlock the power of data with Python for data science.',
-            'price': 99.99,
+            'price': 149.99,
             'image': 'html.png'
         },
         {
             'title': 'Machine Learning A-Z',
             'description': 'Become a machine learning expert with this comprehensive course.',
-            'price': 129.99,
+            'price': 149.99,
             'image': 'images.jpeg'
         },
     ]

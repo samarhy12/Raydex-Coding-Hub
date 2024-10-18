@@ -1,22 +1,63 @@
-{% extends "base.html" %} {% block content %}
-<h1 class="mb-4">Progress for {{ user.username }}</h1>
-{% for course_id, data in progress.items() %}
-<div class="card mb-3">
-  <div class="card-body">
-    <h5 class="card-title">{{ data['course'].title }}</h5>
-    <p class="card-text">
-      Completed {{ data['completed'] }} out of {{ data['total'] }} lessons
-    </p>
-    <div class="progress">
-      <div
-        class="progress-bar"
-        role="progressbar"
-        style="width: {{ (data['completed'] / data['total']) * 100 }}%"
-        aria-valuenow="{{ data['completed'] }}"
-        aria-valuemin="0"
-        aria-valuemax="{{ data['total'] }}"
-      ></div>
-    </div>
-  </div>
-</div>
-{% endfor %} {% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Progress - {{ user.username }}</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100">
+    <nav class="bg-blue-600 p-4 text-white">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">User Progress - {{ user.username }}</h1>
+        <ul class="flex space-x-4">
+          <li>
+            <a href="{{ url_for('admin_dashboard') }}" class="hover:underline"
+              >Dashboard</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('admin_courses') }}" class="hover:underline"
+              >Courses</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('admin_users') }}" class="hover:underline"
+              >Users</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('logout') }}" class="hover:underline">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="container mx-auto mt-8 p-4">
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold mb-4">Course Progress</h2>
+        {% for course_id, data in progress.items() %}
+        <div class="mb-6 border-b pb-4">
+          <h3 class="text-xl font-semibold">{{ data.course.title }}</h3>
+          <div class="mt-2 flex items-center">
+            <div
+              class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mr-4"
+            >
+              <div
+                class="bg-blue-600 h-2.5 rounded-full"
+                style="width: {{ (data.completed / data.total) * 100 }}%"
+              ></div>
+            </div>
+            <span class="text-sm font-medium text-gray-500"
+              >{{ data.completed }} / {{ data.total }} lessons completed</span
+            >
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </main>
+  </body>
+</html>

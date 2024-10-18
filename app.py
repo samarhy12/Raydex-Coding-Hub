@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, redirect, url_for, flash, request, abort, jsonify
+from flask import Flask, render_template, redirect, url_for, flash, request, abort, jsonify, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -8,7 +8,7 @@ from flask_mail import Mail, Message
 import secrets
 from PIL import Image
 from flask_migrate import Migrate
-from cloudinary import CloudinaryResource
+from cloudinary import uploader
 from cloudinary.uploader import upload
 from cloudinary.utils import cloudinary_url
 from flask_wtf import CSRFProtect
@@ -74,7 +74,7 @@ if not app.debug:
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
     app.logger.setLevel(logging.INFO)
-    app.logger.info('E-Learning platform startup')
+    app.logger.info('Raydex Hub startup')
 
 # User Model
 class User(db.Model, UserMixin):
@@ -257,6 +257,28 @@ def get_cloudinary_video_url(public_id):
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
+
+def delete_video_from_cloudinary(public_id):
+    if not public_id:
+        current_app.logger.error("Attempted to delete video with empty public_id")
+        return False
+
+    try:
+        result = uploader.destroy(public_id, resource_type="video", invalidate=True)
+        
+        if result.get('result') == 'ok':
+            current_app.logger.info(f"Successfully deleted video with public_id: {public_id}")
+            return True
+        else:
+            current_app.logger.warning(f"Failed to delete video with public_id: {public_id}. Cloudinary response: {result}")
+            return False
+    
+    except cloudinary.exceptions.Error as e:
+        current_app.logger.error(f"Cloudinary error when deleting video {public_id}: {str(e)}")
+        return False
+    except Exception as e:
+        current_app.logger.error(f"Unexpected error when deleting video {public_id}: {str(e)}")
+        return False
 
 # Load user
 @login_manager.user_loader
@@ -765,6 +787,45 @@ def admin_email_course(course_id):
         return redirect(url_for('admin_course_students', course_id=course_id))
     return render_template('admin/email_course.html', course=course)
 
+@app.route('/admin/lesson/<int:lesson_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_lesson(lesson_id):
+    if not current_user.is_admin:
+        abort(403)
+    
+    lesson = Lesson.query.get_or_404(lesson_id)
+    
+    if request.method == 'POST':
+        lesson.title = request.form['title']
+        lesson.content = request.form['content']
+        
+        # Handle video updates
+        video_ids = request.form.getlist('video_id[]')
+        video_titles = request.form.getlist('video_title[]')
+        video_files = request.files.getlist('video_file[]')
+        
+        for v_id, v_title, v_file in zip(video_ids, video_titles, video_files):
+            if v_id:  # Existing video
+                video = Video.query.get(int(v_id))
+                if video:
+                    video.title = v_title
+                    if v_file:
+                        # Delete old video from Cloudinary
+                        delete_video_from_cloudinary(video.public_id)
+                        # Upload new video
+                        new_public_id = upload_video_to_cloudinary(v_file)
+                        video.public_id = new_public_id
+            elif v_title and v_file:  # New video
+                new_public_id = upload_video_to_cloudinary(v_file)
+                new_video = Video(title=v_title, public_id=new_public_id, lesson_id=lesson.id)
+                db.session.add(new_video)
+        
+        db.session.commit()
+        flash('Lesson updated successfully!', 'success')
+        return redirect(url_for('admin_lessons', course_id=lesson.course_id))
+    
+    return render_template('admin/edit_lesson.html', lesson=lesson)
+
 @app.route('/admin/make_admin/<int:user_id>', methods=['POST'])
 @login_required
 def make_admin(user_id):
@@ -822,22 +883,6 @@ def profile():
         return redirect(url_for('profile'))
     return render_template('profile.html')
 
-@app.route('/update_profile_picture', methods=['POST'])
-@login_required
-def update_profile_picture():
-    if 'profile_picture' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-    file = request.files['profile_picture']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
-        current_user.profile_picture = filename
-        db.session.commit()
-        return jsonify({'success': True, 'filename': filename}), 200
-    return jsonify({'error': 'File type not allowed'}), 400
 
 @app.route('/web')
 def web_development():

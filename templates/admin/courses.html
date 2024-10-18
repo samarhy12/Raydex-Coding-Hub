@@ -1,65 +1,127 @@
-{% extends "base.html" %} {% block content %}
-<h1 class="mb-4">Manage Courses</h1>
-<form method="POST" class="mb-4">
-  <div class="form-group">
-    <label for="title">Course Title</label>
-    <input type="text" class="form-control" id="title" name="title" required />
-  </div>
-  <div class="form-group">
-    <label for="description">Description</label>
-    <textarea
-      class="form-control"
-      id="description"
-      name="description"
-      rows="3"
-      required
-    ></textarea>
-  </div>
-  <div class="form-group">
-    <label for="price">Price</label>
-    <input
-      type="number"
-      class="form-control"
-      id="price"
-      name="price"
-      step="0.01"
-      required
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Courses</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
     />
-  </div>
-  <div class="form-group">
-    <label for="image">Course Image</label>
-    <input type="file" class="form-control-file" id="image" name="image" />
-  </div>
-  <button type="submit" class="btn btn-primary">Add Course</button>
-</form>
-<h2>Existing Courses</h2>
-<table class="table">
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Price</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for course in courses %}
-    <tr>
-      <td>{{ course.title }}</td>
-      <td>${{ course.price }}</td>
-      <td>
-        <a
-          href="{{ url_for('admin_lessons', course_id=course.id) }}"
-          class="btn btn-sm btn-info"
-          >Manage Lessons</a
+  </head>
+  <body class="bg-gray-100">
+    <nav class="bg-blue-600 p-4 text-white">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Admin Courses</h1>
+        <ul class="flex space-x-4">
+          <li>
+            <a href="{{ url_for('admin_dashboard') }}" class="hover:underline"
+              >Dashboard</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('admin_courses') }}" class="hover:underline"
+              >Courses</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('admin_users') }}" class="hover:underline"
+              >Users</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('logout') }}" class="hover:underline">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="container mx-auto mt-8 p-4">
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold mb-4">Add New Course</h2>
+        <form
+          action="{{ url_for('admin_courses') }}"
+          method="POST"
+          enctype="multipart/form-data"
+          class="space-y-4"
         >
-        <a
-          href="{{ url_for('admin_course_students', course_id=course.id) }}"
-          class="btn btn-sm btn-secondary"
-          >View Students</a
-        >
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% endblock %}
+          <div>
+            <label for="title" class="block text-sm font-medium text-gray-700"
+              >Title</label
+            >
+            <input
+              type="text"
+              id="title"
+              name="title"
+              required
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
+          </div>
+          <div>
+            <label
+              for="description"
+              class="block text-sm font-medium text-gray-700"
+              >Description</label
+            >
+            <textarea
+              id="description"
+              name="description"
+              rows="3"
+              required
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            ></textarea>
+          </div>
+          <div>
+            <label for="price" class="block text-sm font-medium text-gray-700"
+              >Price</label
+            >
+            <input
+              type="number"
+              id="price"
+              name="price"
+              step="0.01"
+              required
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            />
+          </div>
+          <div>
+            <label for="image" class="block text-sm font-medium text-gray-700"
+              >Course Image</label
+            >
+            <input
+              type="file"
+              id="image"
+              name="image"
+              accept="image/*"
+              class="mt-1 block w-full"
+            />
+          </div>
+          <button
+            type="submit"
+            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          >
+            Add Course
+          </button>
+        </form>
+      </div>
+
+      <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold mb-4">Existing Courses</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for course in courses %}
+          <div class="border rounded-lg p-4">
+            <h3 class="text-xl font-semibold">{{ course.title }}</h3>
+            <p class="text-gray-600 mt-2">{{ course.description }}</p>
+            <p class="text-blue-600 font-bold mt-2">${{ course.price }}</p>
+            <a
+              href="{{ url_for('admin_lessons', course_id=course.id) }}"
+              class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+              >Manage Lessons</a
+            >
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,27 +1,54 @@
-{% extends "base.html" %} {% block content %}
-<h1 class="mb-4">Admin Dashboard</h1>
-<div class="row">
-  <div class="col-md-4">
-    <div class="card mb-4">
-      <div class="card-body">
-        <h5 class="card-title">Courses</h5>
-        <p class="card-text">Total: {{ courses|length }}</p>
-        <a href="{{ url_for('admin_courses') }}" class="btn btn-primary"
-          >Manage Courses</a
-        >
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100">
+    <nav class="bg-blue-600 p-4 text-white">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+        <ul class="flex space-x-4">
+          <li>
+            <a href="{{ url_for('admin_dashboard') }}" class="hover:underline"
+              >Dashboard</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('admin_courses') }}" class="hover:underline"
+              >Courses</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('admin_users') }}" class="hover:underline"
+              >Users</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('logout') }}" class="hover:underline">Logout</a>
+          </li>
+        </ul>
       </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card mb-4">
-      <div class="card-body">
-        <h5 class="card-title">Users</h5>
-        <p class="card-text">Total: {{ users|length }}</p>
-        <a href="{{ url_for('admin_users') }}" class="btn btn-primary"
-          >Manage Users</a
-        >
+    </nav>
+
+    <main class="container mx-auto mt-8 p-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-xl font-semibold mb-4">Courses Overview</h2>
+          <p class="text-3xl font-bold text-blue-600">{{ courses|length }}</p>
+          <p class="text-gray-600">Total Courses</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-xl font-semibold mb-4">Users Overview</h2>
+          <p class="text-3xl font-bold text-green-600">{{ users|length }}</p>
+          <p class="text-gray-600">Total Users</p>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
-{% endblock %}
+    </main>
+  </body>
+</html>

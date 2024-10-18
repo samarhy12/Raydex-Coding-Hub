@@ -86,21 +86,31 @@
 </section>
 
 <section id="instructors" class="container">
-  <h2 class="section-title">Meet Our Top Instructors</h2>
+  <h2 class="section-title">Meet Our Instructor</h2>
   <div class="instructors">
-    <div class="instructor-card">
-      <img src="/api/placeholder/400/400" alt="John Doe" />
+    <div class="instructor-card col-lg-4 col-md-12 mx-auto">
+      <img
+        src="{{ url_for('static', filename='images/ralph.jpg')}}"
+        alt="Agyarey Raphael Yeboah Wadie"
+      />
       <div class="instructor-content">
-        <h3 class="instructor-name">John Doe</h3>
+        <h3 class="instructor-name">Agyarey Raphael Yeboah Wadie</h3>
         <p class="instructor-title">Web Development Expert</p>
         <div class="social-links">
-          <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-linkedin"></i></a>
-          <a href="#"><i class="fab fa-github"></i></a>
+          <a href="https://x.com/themmatarget"
+            ><i class="fab fa-twitter"></i
+          ></a>
+          <a
+            href="https://gh.linkedin.com/in/raphael-yeboah-wadie-agyarey-3b6a3a24b"
+            ><i class="fab fa-linkedin"></i
+          ></a>
+          <a href="https://github.com/samarhy12"
+            ><i class="fab fa-github"></i
+          ></a>
         </div>
       </div>
     </div>
-    <div class="instructor-card">
+    <!-- <div class="instructor-card">
       <img src="/api/placeholder/400/400" alt="Jane Smith" />
       <div class="instructor-content">
         <h3 class="instructor-name">Jane Smith</h3>
@@ -111,7 +121,7 @@
           <a href="#"><i class="fab fa-github"></i></a>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </section>
 

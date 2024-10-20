@@ -1,0 +1,161 @@
+{% extends "base_chat.html" %} {% block title %}{{ course.title }} - Course
+Chat{% endblock %} {% block content %}
+<div class="container mx-auto px-4 py-6">
+  <div class="bg-white rounded-lg shadow-lg p-4 chat-container">
+    <h2 class="text-2xl font-bold text-green-600 mb-4">
+      {{ course.title }} - Course Chat
+    </h2>
+
+    <div class="messages-container">
+      {% for message in messages %}
+      <div
+        class="flex {% if message.sender_id == current_user.id %}justify-end{% endif %} mb-4"
+      >
+        <div
+          class="message-bubble {% if message.sender_id == current_user.id %}message-bubble-right{% else %}message-bubble-left{% endif %}"
+        >
+          <div class="text-sm opacity-75 mb-1">
+            {{ message.sender.username }}
+          </div>
+          {{ message.content }}
+          <div class="text-xs opacity-75 mt-1">
+            {{ message.timestamp.strftime('%H:%M') }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="typing-indicator mt-2 mb-2" style="display: none">
+      <span id="typing-username"></span> is typing...
+    </div>
+
+    <div class="mt-4">
+      <form id="message-form" class="flex space-x-2">
+        <input
+          type="text"
+          id="message-input"
+          class="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:border-green-500"
+          placeholder="Type your message..."
+        />
+        <button
+          type="submit"
+          class="bg-green-600 text-white rounded-full px-6 py-2 hover:bg-green-700 transition duration-200"
+        >
+          Send
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const socket = io();
+    const currentUser = "{{ current_user.username }}";
+    const courseId = "{{ course.id }}";
+    const roomId = `course_${courseId}`;
+    let typingTimeout;
+
+    // Join course room
+    socket.emit("join", { room: roomId });
+
+    // Handle message form submission
+    document
+      .getElementById("message-form")
+      .addEventListener("submit", function (e) {
+        e.preventDefault();
+        const input = document.getElementById("message-input");
+        const content = input.value.trim();
+
+        if (content) {
+          socket.emit("message", {
+            room: roomId,
+            type: "course",
+            msg: content,
+          });
+          input.value = "";
+        }
+      });
+
+    // Handle typing
+    document
+      .getElementById("message-input")
+      .addEventListener("keyup", function () {
+        socket.emit("typing", { room: roomId });
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+          socket.emit("stop_typing", { room: roomId });
+        }, 1000);
+      });
+
+    // Handle incoming messages
+    socket.on("message", function (data) {
+      const messagesContainer = document.querySelector(".messages-container");
+      const messageDiv = document.createElement("div");
+      const isCurrentUser = data.username === currentUser;
+
+      messageDiv.className = `flex ${
+        isCurrentUser ? "justify-end" : ""
+      } mb-4 animate__animated animate__fadeIn`;
+      messageDiv.innerHTML = `
+        <div class="message-bubble ${
+          isCurrentUser ? "message-bubble-right" : "message-bubble-left"
+        }">
+          <div class="text-sm opacity-75 mb-1">${data.username}</div>
+          ${data.msg}
+          <div class="text-xs opacity-75 mt-1">${new Date().toLocaleTimeString(
+            [],
+            { hour: "2-digit", minute: "2-digit" }
+          )}</div>
+        </div>
+      `;
+
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    });
+
+    // Handle typing indicators
+    socket.on("typing", function (data) {
+      if (data.username !== currentUser) {
+        const typingIndicator = document.querySelector(".typing-indicator");
+        const typingUsername = document.getElementById("typing-username");
+        typingUsername.textContent = data.username;
+        typingIndicator.style.display = "inline-block";
+      }
+    });
+
+    socket.on("stop_typing", function (data) {
+      if (data.username !== currentUser) {
+        const typingIndicator = document.querySelector(".typing-indicator");
+        typingIndicator.style.display = "none";
+      }
+    });
+
+    // Handle online status
+    socket.on("user_connected", function (data) {
+      // Add user online status indicator
+      const userElements = document.querySelectorAll(
+        `[data-username="${data.username}"]`
+      );
+      userElements.forEach((el) => {
+        el.classList.add("online");
+      });
+    });
+
+    socket.on("user_disconnected", function (data) {
+      // Remove user online status indicator
+      const userElements = document.querySelectorAll(
+        `[data-username="${data.username}"]`
+      );
+      userElements.forEach((el) => {
+        el.classList.remove("online");
+      });
+    });
+
+    // Initial scroll to bottom
+    const messagesContainer = document.querySelector(".messages-container");
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  });
+</script>
+{% endblock %}

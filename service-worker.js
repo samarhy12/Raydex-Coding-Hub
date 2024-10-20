@@ -1,46 +1,34 @@
-const CACHE_NAME = "raydex-coding-hub-v1";
+const CACHE_NAME = "raydex-hub-v1";
 const urlsToCache = [
   "/",
   "/static/css/style.css",
-  "/static/js/main.js",
-  "/static/icons/icon-192x192.png",
-  "/static/icons/icon-512x512.png",
-  "/manifest.json",
-  // Add other essential assets (images, fonts, etc.)
+  "/static/images/favicon.png",
+  "/static/images",
 ];
 
-// Install event - Cache files
-self.addEventListener("install", function (event) {
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(function (cache) {
-      console.log("Opened cache");
-      return cache.addAll(urlsToCache);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
   );
 });
 
-// Fetch event - Serve cached files if available
-self.addEventListener("fetch", function (event) {
+self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then(function (response) {
-      // Cache hit - return the cached response
+    caches.match(event.request).then((response) => {
       if (response) {
         return response;
       }
-
-      // Fall back to network request if not in cache
       return fetch(event.request);
     })
   );
 });
 
-// Activate event - Cleanup old caches
-self.addEventListener("activate", function (event) {
+self.addEventListener("activate", (event) => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(function (cacheNames) {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map(function (cacheName) {
+        cacheNames.map((cacheName) => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
             return caches.delete(cacheName);
           }

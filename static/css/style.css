@@ -43,8 +43,8 @@ body {
 }
 
 .navbar-brand img {
-  height: 40px !important;
-  transition: transform 0.3s ease !important;
+  height: 40px;
+  transition: transform 0.3s ease;
 }
 
 .navbar-brand:hover img {
@@ -469,13 +469,11 @@ body {
 /* Flash Messages */
 #flash-messages {
   position: fixed;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 20px;
+  right: 20px;
   z-index: 9999;
   width: 90%;
   max-width: 400px;
-  text-align: center;
 }
 
 .flash-message {

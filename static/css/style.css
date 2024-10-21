@@ -43,8 +43,8 @@ body {
 }
 
 .navbar-brand img {
-  height: 40px;
-  transition: transform 0.3s ease;
+  height: 40px !important;
+  transition: transform 0.3s ease !important;
 }
 
 .navbar-brand:hover img {

@@ -20,6 +20,7 @@ from dotenv import load_dotenv
 import requests
 from werkzeug.utils import secure_filename
 from flask_socketio import SocketIO, emit, join_room, leave_room
+from itsdangerous import URLSafeTimedSerializer
 
 # Initialize the app
 app = Flask(__name__)
@@ -131,14 +132,30 @@ class Lesson(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    quiz = db.Column(db.Text, nullable=True)
-    assignment = db.Column(db.Text, nullable=True)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
     progress = db.relationship('Progress', backref='lesson', lazy=True)
     videos = db.relationship('Video', backref='lesson', lazy=True, cascade="all, delete-orphan")
+    quiz = db.relationship('Quiz', backref='lesson', uselist=False, lazy=True, cascade="all, delete-orphan")
+    assignment = db.relationship('Assignment', backref='lesson', uselist=False, lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"Lesson('{self.title}', 'Course ID: {self.course_id}')"
+    
+class Quiz(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'), nullable=False)
+
+    def __repr__(self):
+        return f"Quiz('Lesson ID: {self.lesson_id}')"
+
+class Assignment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    lesson_id = db.Column(db.Integer, db.ForeignKey('lesson.id'), nullable=False)
+
+    def __repr__(self):
+        return f"Assignment('Lesson ID: {self.lesson_id}')"
 
 # New Video Model
 class Video(db.Model):
@@ -534,6 +551,88 @@ def logout():
     return redirect(url_for('home'))
 
 
+@app.route("/forgot_password", methods=['GET', 'POST'])
+def forgot_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        
+        if user:
+            # Generate reset token
+            token = generate_reset_token(user.email)
+            
+            # Send reset email
+            reset_link = url_for('reset_password', token=token, _external=True)
+            send_email(
+                subject='Reset Your Raydex Hub Password',
+                recipient=user.email,
+                template='reset_password_email',
+                username=user.username,
+                reset_link=reset_link
+            )
+            
+            flash('An email has been sent with instructions to reset your password.', 'info')
+            return redirect(url_for('login'))
+        else:
+            flash('No account found with that email address.', 'danger')
+    
+    return render_template('forgot_password.html')
+
+@app.route("/reset_password/<token>", methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    
+    email = verify_reset_token(token)
+    if email is None:
+        flash('Invalid or expired reset token.', 'danger')
+        return redirect(url_for('forgot_password'))
+    
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        flash('Invalid reset token.', 'danger')
+        return redirect(url_for('forgot_password'))
+
+    if request.method == 'POST':
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+            return render_template('reset_password.html')
+        
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        user.password = hashed_password
+        db.session.commit()
+        
+        # Send confirmation email
+        send_email(
+            subject='Your Raydex Hub Password Has Been Reset',
+            recipient=user.email,
+            template='password_changed_email',
+            username=user.username
+        )
+        
+        flash('Your password has been updated! You can now log in.', 'success')
+        return redirect(url_for('login'))
+    
+    return render_template('reset_password.html')
+
+# In utils.py
+def generate_reset_token(email):
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    return serializer.dumps(email, salt='password-reset-salt')
+
+def verify_reset_token(token, expiration=3600):
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    try:
+        email = serializer.loads(token, salt='password-reset-salt', max_age=expiration)
+        return email
+    except:
+        return None
 
 # Updated route for viewing a lesson
 @app.route('/course/<int:course_id>/lesson/<int:lesson_id>', methods=['GET'])
@@ -700,37 +799,6 @@ def admin_courses():
     return render_template('admin/courses.html', courses=courses)
 
 
-# Updated route for admin to add/edit lessons
-# Modify the admin_lessons route to handle Cloudinary upload
-@app.route('/admin/course/<int:course_id>/lessons', methods=['GET', 'POST'])
-@login_required
-def admin_lessons(course_id):
-    if not current_user.is_admin:
-        abort(403)
-    course = Course.query.get_or_404(course_id)
-    if request.method == 'POST':
-        title = request.form['title']
-        content = request.form['content']
-        new_lesson = Lesson(title=title, content=content, course_id=course_id)
-        db.session.add(new_lesson)
-        db.session.commit()
-
-        # Handle multiple video submissions
-        video_titles = request.form.getlist('video_title[]')
-        video_files = request.files.getlist('video_file[]')
-        for i, (v_title, v_file) in enumerate(zip(video_titles, video_files)):
-            if v_title and v_file:
-                public_id = upload_video_to_cloudinary(v_file)
-                new_video = Video(title=v_title, public_id=public_id, order=i+1, lesson_id=new_lesson.id)
-                db.session.add(new_video)
-        
-        db.session.commit()
-        flash('New lesson added successfully!', 'success')
-        return redirect(url_for('admin_lessons', course_id=course_id))
-    
-    lessons = Lesson.query.filter_by(course_id=course_id).all()
-    return render_template('admin/lessons.html', course=course, lessons=lessons)
-
 @app.route('/admin/course/<int:course_id>/students')
 @login_required
 def admin_course_students(course_id):
@@ -801,6 +869,48 @@ def admin_email_course(course_id):
         return redirect(url_for('admin_course_students', course_id=course_id))
     return render_template('admin/email_course.html', course=course)
 
+@app.route('/admin/course/<int:course_id>/lessons', methods=['GET', 'POST'])
+@login_required
+def admin_lessons(course_id):
+    if not current_user.is_admin:
+        abort(403)
+    course = Course.query.get_or_404(course_id)
+    
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        new_lesson = Lesson(title=title, content=content, course_id=course_id)
+        db.session.add(new_lesson)
+        db.session.commit()
+        
+        # Handle multiple video submissions
+        video_titles = request.form.getlist('video_title[]')
+        video_files = request.files.getlist('video_file[]')
+        for i, (v_title, v_file) in enumerate(zip(video_titles, video_files)):
+            if v_title and v_file:
+                public_id = upload_video_to_cloudinary(v_file)
+                new_video = Video(title=v_title, public_id=public_id, order=i+1, lesson_id=new_lesson.id)
+                db.session.add(new_video)
+        
+        # Handle quiz submission
+        quiz_content = request.form.get('quiz')
+        if quiz_content:
+            new_quiz = Quiz(content=quiz_content, lesson_id=new_lesson.id)
+            db.session.add(new_quiz)
+        
+        # Handle assignment submission
+        assignment_content = request.form.get('assignment')
+        if assignment_content:
+            new_assignment = Assignment(content=assignment_content, lesson_id=new_lesson.id)
+            db.session.add(new_assignment)
+        
+        db.session.commit()
+        flash('New lesson added successfully!', 'success')
+        return redirect(url_for('admin_lessons', course_id=course_id))
+    
+    lessons = Lesson.query.filter_by(course_id=course_id).all()
+    return render_template('admin/lessons.html', course=course, lessons=lessons)
+
 @app.route('/admin/lesson/<int:lesson_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_lesson(lesson_id):
@@ -824,15 +934,31 @@ def edit_lesson(lesson_id):
                 if video:
                     video.title = v_title
                     if v_file:
-                        # Delete old video from Cloudinary
                         delete_video_from_cloudinary(video.public_id)
-                        # Upload new video
                         new_public_id = upload_video_to_cloudinary(v_file)
                         video.public_id = new_public_id
             elif v_title and v_file:  # New video
                 new_public_id = upload_video_to_cloudinary(v_file)
                 new_video = Video(title=v_title, public_id=new_public_id, lesson_id=lesson.id)
                 db.session.add(new_video)
+        
+        # Handle quiz update
+        quiz_content = request.form.get('quiz')
+        if quiz_content:
+            if lesson.quiz:
+                lesson.quiz.content = quiz_content
+            else:
+                new_quiz = Quiz(content=quiz_content, lesson_id=lesson.id)
+                db.session.add(new_quiz)
+        
+        # Handle assignment update
+        assignment_content = request.form.get('assignment')
+        if assignment_content:
+            if lesson.assignment:
+                lesson.assignment.content = assignment_content
+            else:
+                new_assignment = Assignment(content=assignment_content, lesson_id=lesson.id)
+                db.session.add(new_assignment)
         
         db.session.commit()
         flash('Lesson updated successfully!', 'success')

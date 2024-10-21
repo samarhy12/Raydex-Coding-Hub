@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% block content %}
-<div class="container mt-5">
+<div class="enroll-container mt-5">
   <h2 class="text-center mb-4">Enroll in {{ course.title }}</h2>
   <div class="card p-4 shadow">
     <p><strong>Course Price:</strong> {{ course.price }} GHS</p>
@@ -36,7 +36,6 @@
               id="first-name"
               value="{{ current_user.username.split()[0] }}"
               required
-              readonly
             />
           </div>
         </div>
@@ -49,7 +48,6 @@
               id="last-name"
               value="{{ current_user.username.split()[-1] }}"
               required
-              readonly
             />
           </div>
         </div>
@@ -138,7 +136,8 @@
 </script>
 
 <style>
-  .container {
+  .enroll-container {
+    margin: 20px auto;
     max-width: 600px;
   }
 </style>

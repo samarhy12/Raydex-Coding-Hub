@@ -96,50 +96,28 @@
           <h5 class="card-title">What You'll Learn</h5>
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
-              <i class="fas fa-check text-success me-2"></i>Key skill 1
+              <i class="fas fa-check text-success me-2"></i>Problem solving
             </li>
             <li class="list-group-item">
-              <i class="fas fa-check text-success me-2"></i>Key skill 2
+              <i class="fas fa-check text-success me-2"></i>Debugging skills
             </li>
             <li class="list-group-item">
-              <i class="fas fa-check text-success me-2"></i>Key skill 3
+              <i class="fas fa-check text-success me-2"></i>Project builder
             </li>
           </ul>
         </div>
         <div class="card-footer">
-          <small class="text-muted">Last updated 3 mins ago</small>
+          <small class="text-muted">last updated: 21-10-2024</small>
         </div>
       </div>
     </div>
   </div>
 
   <div class="text-center mt-5">
-    <a href="{{ url_for('courses') }}" class="btn btn-secondary"
+    <a href="{{ url_for('courses') }}" class="btn btn-signup mb-3"
       >Back to Courses</a
     >
   </div>
 </div>
-
-<style>
-  body {
-    background-color: #f8f9fa;
-  }
-  .card {
-    border: none;
-    transition: transform 0.2s;
-  }
-  .card:hover {
-    transform: translateY(-5px);
-  }
-  .progress {
-    height: 25px;
-  }
-  .progress-bar {
-    line-height: 25px;
-  }
-  .list-group-item:hover {
-    background-color: #f1f3f5;
-  }
-</style>
 
 {% endblock %}

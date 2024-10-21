@@ -10,7 +10,6 @@
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
     <style>
-      /* Reset and base styles */
       * {
         margin: 0;
         padding: 0;
@@ -295,6 +294,16 @@
             >
             {% endif %}
           </div>
+          {% if next_lesson %}
+          <div class="mt-4">
+            <a
+              href="{{ url_for('lesson', course_id=lesson.course_id, lesson_id=next_lesson.id) }}"
+              class="btn btn-login"
+            >
+              Next Lesson: {{ next_lesson.title }}
+            </a>
+          </div>
+          {% endif %}
         </div>
       </div>
 
@@ -333,25 +342,7 @@
         <div class="modal-body">
           {% if lesson.quiz %}
           <form id="quizForm">
-            {% for question in lesson.quiz.questions %}
-            <div class="quiz-question">
-              <p><strong>{{ loop.index }}. {{ question.text }}</strong></p>
-              <ul class="quiz-options">
-                {% for option in question.options %}
-                <li class="quiz-option">
-                  <label>
-                    <input
-                      type="radio"
-                      name="question_{{ loop.parent.index }}"
-                      value="{{ loop.index }}"
-                    />
-                    {{ option }}
-                  </label>
-                </li>
-                {% endfor %}
-              </ul>
-            </div>
-            {% endfor %}
+            {{ lesson.quiz.content | safe }}
             <button type="submit" class="btn">Submit Quiz</button>
           </form>
           {% else %}
@@ -369,7 +360,7 @@
         <div class="modal-body">
           {% if lesson.assignment %}
           <div class="assignment-description">
-            {{ lesson.assignment.description | safe }}
+            {{ lesson.assignment.content | safe }}
           </div>
           <form id="assignmentForm" class="assignment-submission">
             <textarea
@@ -384,7 +375,6 @@
         </div>
       </div>
     </div>
-
     <script>
       document.addEventListener('DOMContentLoaded', function() {
           let currentVideoIndex = 0;

@@ -44,9 +44,6 @@
                 required
               />
             </div>
-            <button type="submit" class="btn btn-primary w-100">
-              Update Profile
-            </button>
           </form>
         </div>
       </div>
@@ -54,28 +51,4 @@
   </div>
 </div>
 
-<script>
-  document
-    .getElementById("profile_picture")
-    .addEventListener("change", function () {
-      var formData = new FormData();
-      formData.append("profile_picture", this.files[0]);
-
-      fetch('{{ url_for("update_profile_picture") }}', {
-        method: "POST",
-        body: formData,
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            location.reload();
-          } else {
-            alert("Error uploading file: " + data.error);
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    });
-</script>
 {% endblock %}

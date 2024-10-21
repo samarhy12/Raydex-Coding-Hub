@@ -1,89 +1,145 @@
 {% extends "base.html" %} {% block content %}
-<h1>Edit Lesson: {{ lesson.title }}</h1>
-<form method="POST" enctype="multipart/form-data">
-  <div class="form-group">
-    <label for="title">Lesson Title</label>
-    <input
-      type="text"
-      class="form-control"
-      id="title"
-      name="title"
-      value="{{ lesson.title }}"
-      required
-    />
-  </div>
-  <div class="form-group">
-    <label for="content">Lesson Content</label>
-    <textarea
-      class="form-control"
-      id="content"
-      name="content"
-      rows="10"
-      required
-    >
-{{ lesson.content }}</textarea
-    >
-  </div>
+<div class="container mx-auto mt-8 p-4">
+  <h1 class="text-3xl font-bold mb-6">Edit Lesson: {{ lesson.title }}</h1>
 
-  <h3>Videos</h3>
-  {% for video in lesson.videos %}
-  <div class="video-item">
-    <input type="hidden" name="video_id[]" value="{{ video.id }}" />
+  <form
+    action="{{ url_for('edit_lesson', lesson_id=lesson.id) }}"
+    method="POST"
+    enctype="multipart/form-data"
+    class="space-y-6"
+  >
     <div class="form-group">
-      <label>Video Title</label>
+      <label for="title" class="block text-sm font-medium text-gray-700"
+        >Lesson Title</label
+      >
       <input
         type="text"
-        class="form-control"
-        name="video_title[]"
-        value="{{ video.title }}"
+        id="title"
+        name="title"
+        value="{{ lesson.title }}"
         required
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
       />
     </div>
+
     <div class="form-group">
-      <label>Current Video</label>
-      <video width="320" height="240" controls>
-        <source src="{{ video.url }}" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
+      <label for="content" class="block text-sm font-medium text-gray-700"
+        >Lesson Content</label
+      >
+      <textarea
+        id="content"
+        name="content"
+        rows="5"
+        required
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+      >
+{{ lesson.content }}</textarea
+      >
     </div>
-    <div class="form-group">
-      <label>Replace Video (optional)</label>
-      <input
-        type="file"
-        class="form-control-file"
-        name="video_file[]"
-        accept="video/*"
-      />
+
+    <h2 class="text-2xl font-semibold mt-8 mb-4">Videos</h2>
+    {% for video in lesson.videos %}
+    <div class="video-item border-b pb-4 mb-4">
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700"
+          >Video Title</label
+        >
+        <input
+          type="text"
+          name="video_title[]"
+          value="{{ video.title }}"
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+        />
+        <input type="hidden" name="video_id[]" value="{{ video.id }}" />
+      </div>
+
+      <div class="form-group mt-4">
+        <label class="block text-sm font-medium text-gray-700"
+          >Current Video</label
+        >
+        <video width="320" height="240" controls class="mt-2">
+          <source src="{{ video.public_id }}" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <div class="form-group mt-4">
+        <label class="block text-sm font-medium text-gray-700"
+          >Replace Video (optional)</label
+        >
+        <input
+          type="file"
+          name="video_file[]"
+          accept="video/*"
+          class="mt-1 block w-full"
+        />
+      </div>
     </div>
-  </div>
-  {% endfor %}
+    {% endfor %}
 
-  <div id="new-videos">
-    <!-- New video fields will be added here dynamically -->
-  </div>
+    <div id="new-videos"></div>
 
-  <button type="button" class="btn btn-secondary" id="add-video">
-    Add New Video
-  </button>
+    <button
+      type="button"
+      id="add-video"
+      class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300"
+    >
+      Add New Video
+    </button>
 
-  <button type="submit" class="btn btn-primary mt-3">Update Lesson</button>
-</form>
+    <div class="form-group mt-8">
+      <label for="quiz" class="block text-sm font-medium text-gray-700"
+        >Quiz (Multiple Choice Questions)</label
+      >
+      <textarea
+        id="quiz"
+        name="quiz"
+        rows="5"
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+      >
+{{ lesson.quiz.content if lesson.quiz else '' }}</textarea
+      >
+    </div>
+
+    <div class="form-group mt-6">
+      <label for="assignment" class="block text-sm font-medium text-gray-700"
+        >Assignment</label
+      >
+      <textarea
+        id="assignment"
+        name="assignment"
+        rows="5"
+        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+      >
+{{ lesson.assignment.content if lesson.assignment else '' }}</textarea
+      >
+    </div>
+
+    <button
+      type="submit"
+      class="mt-8 bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+    >
+      Update Lesson
+    </button>
+  </form>
+</div>
 
 <script>
   document.getElementById("add-video").addEventListener("click", function () {
-    var newVideoDiv = document.createElement("div");
-    newVideoDiv.className = "video-item mt-3";
+    const newVideos = document.getElementById("new-videos");
+    const newVideoDiv = document.createElement("div");
+    newVideoDiv.className = "video-item border-b pb-4 mb-4";
     newVideoDiv.innerHTML = `
-        <div class="form-group">
-            <label>New Video Title</label>
-            <input type="text" class="form-control" name="video_title[]" required>
-        </div>
-        <div class="form-group">
-            <label>New Video File</label>
-            <input type="file" class="form-control-file" name="video_file[]" accept="video/*" required>
-        </div>
-    `;
-    document.getElementById("new-videos").appendChild(newVideoDiv);
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700">New Video Title</label>
+                    <input type="text" name="video_title[]" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+                <div class="form-group mt-4">
+                    <label class="block text-sm font-medium text-gray-700">New Video File</label>
+                    <input type="file" name="video_file[]" accept="video/*" class="mt-1 block w-full">
+                </div>
+            `;
+    newVideos.appendChild(newVideoDiv);
   });
 </script>
 {% endblock %}

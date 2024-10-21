@@ -13,161 +13,93 @@
       content="Raydex, coding, programming, web development, data science, machine learning, mobile development"
     />
     <meta name="author" content="Raydex Hub" />
-    <meta property="og:title" content="Raydex Coding Hub - Home" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.learn.raydexhub.com/" />
+    <meta
+      property="og:title"
+      content="Raydex Coding Hub - Learn Coding the Smart Way"
+    />
     <meta
       property="og:description"
-      content="Learn coding skills with Raydex Coding Hub. Explore courses taught by industry experts and build real-world projects."
+      content="Master coding skills with Raydex Coding Hub. Join expert-led courses and build impressive projects."
     />
     <meta
       property="og:image"
-      content="{{ url_for('static', filename='images/favicon.png') }}"
+      content="https://www.learn.raydexhub.com/static/images/og-image.jpg"
     />
-    <meta property="og:url" content="http://www.learn.raydexhub.com/" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Raydex Coding Hub - Home" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://www.learn.raydexhub.com/" />
     <meta
-      name="twitter:description"
-      content="Learn coding skills with Raydex Coding Hub. Explore courses taught by industry experts and build real-world projects."
+      property="twitter:title"
+      content="Raydex Coding Hub - Learn Coding the Smart Way"
     />
     <meta
-      name="twitter:image"
-      content="{{ url_for('static', filename='images/favicon.png') }}"
+      property="twitter:description"
+      content="Master coding skills with Raydex Coding Hub. Join expert-led courses and build impressive projects."
     />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="{{url_for('static', filename='css/style.css')}}"
+    <meta
+      property="twitter:image"
+      content="https://www.learn.raydexhub.com/static/images/twitter-image.jpg"
     />
 
     <!-- Favicon -->
-    <link href="https://raydexhub.com/img/favicon.ico" rel="icon" />
     <link
-      href="https://raydexhub.com/img/apple-touch-icon.png"
+      rel="icon"
+      href="https://raydexhub.com/img/favicon.ico"
+      type="image/x-icon"
+    />
+    <link
       rel="apple-touch-icon"
+      href="https://raydexhub.com/img/apple-touch-icon.png"
     />
 
-    <style>
-      :root {
-        --raydex-green: #2ecc71;
-        --raydex-dark-green: #27ae60;
-        --raydex-light-gray: #f8f9fa;
-        --raydex-dark-gray: #495057;
-      }
+    <!-- Preload critical assets -->
+    <link
+      rel="preload"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      as="style"
+    />
+    <link
+      rel="preload"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      as="style"
+    />
+    <link
+      rel="preload"
+      href="{{ url_for('static', filename='css/style.css') }}"
+      as="style"
+    />
+    <link
+      rel="preload"
+      href="{{ url_for('static', filename='images/bg.png') }}"
+      as="image"
+    />
 
-      .navbar {
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
+    <!-- Stylesheets -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
 
-      .navbar-brand img {
-        height: 40px;
-        transition: transform 0.3s ease;
-      }
-
-      .navbar-brand:hover img {
-        transform: scale(1.05);
-      }
-
-      .nav-link {
-        color: var(--raydex-dark-gray);
-        font-weight: 500;
-        padding: 0.5rem 1rem;
-        transition: color 0.2s ease, background-color 0.2s ease;
-        border-radius: 5px;
-      }
-
-      .nav-link:hover,
-      .nav-link:focus {
-        color: var(--raydex-green);
-        background-color: var(--raydex-light-gray);
-      }
-
-      .navbar-nav .dropdown-menu {
-        border: none;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-      }
-
-      .dropdown-item {
-        padding: 0.5rem 1.5rem;
-        color: var(--raydex-dark-gray);
-        transition: color 0.2s ease, background-color 0.2s ease;
-      }
-
-      .dropdown-item:hover,
-      .dropdown-item:focus {
-        background-color: var(--raydex-light-gray);
-        color: var(--raydex-green);
-      }
-
-      .btn-login,
-      .btn-signup {
-        padding: 0.5rem 1.5rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-      }
-
-      .btn-login {
-        color: var(--raydex-green);
-        border: 1px solid var(--raydex-green);
-      }
-
-      .btn-login:hover {
-        background-color: var(--raydex-green);
-        color: white;
-      }
-
-      .btn-signup {
-        background-color: var(--raydex-green);
-        color: white;
-      }
-
-      .btn-signup:hover {
-        background-color: var(--raydex-dark-green);
-      }
-
-      .user-dropdown img {
-        width: 32px;
-        height: 32px;
-        object-fit: cover;
-      }
-
-      @media (max-width: 991.98px) {
-        .navbar-collapse {
-          background-color: white;
-          padding: 1rem;
-          border-radius: 8px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar-nav {
-          margin-bottom: 1rem;
-        }
-
-        .nav-item {
-          margin-bottom: 0.5rem;
-        }
-
-        .btn-login,
-        .btn-signup {
-          display: block;
-          width: 100%;
-          margin-bottom: 0.5rem;
-        }
-
-        .user-dropdown {
-          text-align: center;
-        }
-      }
-    </style>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+    <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container">
         <a class="navbar-brand" href="{{ url_for('home') }}">
           <img
@@ -195,7 +127,7 @@
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('forum') }}">Posts</a>
             </li>
-            <li class="nav-item"></li>
+            <li class="nav-item">
               <a class="nav-link" href="{{ url_for('chat_users') }}">Chat</a>
             </li>
             <li class="nav-item dropdown">
@@ -269,16 +201,10 @@
               </ul>
             </div>
             {% else %}
-            <a
-              href="{{ url_for('login') }}"
-              class="btn course-btn me-2"
-              style="border: 1px solid #2ecc71"
+            <a href="{{ url_for('login') }}" class="btn btn-login me-2"
               >Log In</a
             >
-            <a
-              href="{{ url_for('register') }}"
-              class="btn course-btn"
-              style="color: white; background-color: #27ae60"
+            <a href="{{ url_for('register') }}" class="btn btn-signup"
               >Sign Up</a
             >
             {% endif %}
@@ -288,105 +214,138 @@
     </nav>
 
     <div id="flash-messages"></div>
+
     <!-- Main content -->
     {% block content %}{% endblock %}
 
     <!-- Footer -->
     <footer class="footer">
-      <div class="container text-center">
-        <p>&copy; 2024 Raydex Coding Hub - Learn Coding the Smart Way!</p>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+            <h5>About Raydex</h5>
+            <p>
+              Raydex Coding Hub is your gateway to mastering coding skills. Join
+              our community of learners and expert instructors.
+            </p>
+          </div>
+          <div class="col-md-4">
+            <h5>Quick Links</h5>
+            <ul class="list-unstyled">
+              <li><a href="{{ url_for('courses') }}">Courses</a></li>
+              <li><a href="{{ url_for('forum') }}">Posts</a></li>
+              <li><a href="{{ url_for('chat_users') }}">Chat</a></li>
+              <li><a href="#">Career Support</a></li>
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <h5>Connect With Us</h5>
+            <ul class="list-inline">
+              <li class="list-inline-item">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+              </li>
+              <li class="list-inline-item">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+              </li>
+              <li class="list-inline-item">
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+              </li>
+              <li class="list-inline-item">
+                <a href="#"><i class="fab fa-instagram"></i></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <hr />
+        <div class="row">
+          <div class="col-md-6">
+            <p>&copy; 2024 Raydex Coding Hub. All rights reserved.</p>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+          </div>
+        </div>
       </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
-            $(document).ready(function() {
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            showFlashMessage("{{ message }}", "{{ category }}");
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-            });
+      $(document).ready(function() {
+          {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                  {% for category, message in messages %}
+                  showFlashMessage("{{ message }}", "{{ category }}");
+                  {% endfor %}
+              {% endif %}
+          {% endwith %}
+      });
 
-            function showFlashMessage(message, category) {
-                const flashContainer = $('#flash-messages');
-                const messageElement = $('<div>')
-                    .addClass('flash-message')
-                    .addClass('flash-' + category)
-                    .text(message);
+      function showFlashMessage(message, category) {
+          const flashContainer = $('#flash-messages');
+          const messageElement = $('<div>')
+              .addClass('flash-message')
+              .addClass('flash-' + category)
+              .text(message);
 
-                flashContainer.append(messageElement);
+          flashContainer.append(messageElement);
 
-                // Fade in
-                setTimeout(() => {
-                    messageElement.css('opacity', 1);
-                }, 10);
+          // Fade in
+          setTimeout(() => {
+              messageElement.css('opacity', 1);
+          }, 10);
 
-                // Fade out and remove after 5 seconds
-                setTimeout(() => {
-                    messageElement.css('opacity', 0);
-                    setTimeout(() => {
-                        messageElement.remove();
-                    }, 500);
-                }, 5000);
-            }
+          // Fade out and remove after 5 seconds
+          setTimeout(() => {
+              messageElement.css('opacity', 0);
+              setTimeout(() => {
+                  messageElement.remove();
+              }, 500);
+          }, 5000);
+      }
 
       let deferredPrompt;
 
       window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent Chrome 67 and earlier from automatically showing the prompt
-        e.preventDefault();
-        // Stash the event so it can be triggered later
-        deferredPrompt = e;
-        // Update UI to notify the user they can add to home screen
-        showAddToHomeScreen();
+          e.preventDefault();
+          deferredPrompt = e;
+          showAddToHomeScreen();
       });
 
       function showAddToHomeScreen() {
-        const addBtn = document.createElement('button');
-        addBtn.style.position = 'fixed';
-        addBtn.style.bottom = '20px';
-        addBtn.style.right = '20px';
-        addBtn.textContent = 'Add to home screen';
-        addBtn.addEventListener('click', addToHomeScreen);
-        document.body.appendChild(addBtn);
+          const addBtn = document.createElement('button');
+          addBtn.classList.add('add-to-home');
+          addBtn.textContent = 'Add to Home Screen';
+          addBtn.addEventListener('click', addToHomeScreen);
+          document.body.appendChild(addBtn);
       }
 
       function addToHomeScreen() {
-        if (deferredPrompt) {
-          // Show the prompt
-          deferredPrompt.prompt();
-          // Wait for the user to respond to the prompt
-          deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-              console.log('User accepted the A2HS prompt');
-            } else {
-              console.log('User dismissed the A2HS prompt');
-            }
-            deferredPrompt = null;
-          });
-        }
+          if (deferredPrompt) {
+              deferredPrompt.prompt();
+              deferredPrompt.userChoice.then((choiceResult) => {
+                  if (choiceResult.outcome === 'accepted') {
+                      console.log('User accepted the A2HS prompt');
+                  } else {
+                      console.log('User dismissed the A2HS prompt');
+                  }
+                  deferredPrompt = null;
+              });
+          }
       }
-    </script>
-    <script>
+
       if ("serviceWorker" in navigator) {
-        window.addEventListener("load", function () {
-          navigator.serviceWorker.register("/service-worker.js").then(
-            function (registration) {
-              console.log(
-                "ServiceWorker registration successful with scope: ",
-                registration.scope
+          window.addEventListener("load", function () {
+              navigator.serviceWorker.register("/service-worker.js").then(
+                  function (registration) {
+                      console.log("ServiceWorker registration successful with scope: ", registration.scope);
+                  },
+                  function (err) {
+                      console.log("ServiceWorker registration failed: ", err);
+                  }
               );
-            },
-            function (err) {
-              console.log("ServiceWorker registration failed: ", err);
-            }
-          );
-        });
+          });
       }
     </script>
   </body>

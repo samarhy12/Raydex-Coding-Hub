@@ -1,96 +1,221 @@
 {% extends "base.html" %} {% block title %}Code Playground{% endblock %} {%
 block content %}
-<div class="container mt-4">
-  <h1 class="text-center">Code Playground</h1>
-  <div class="row">
-    <div class="col-md-6">
-      <div class="form-group mb-3">
-        <label for="htmlCode">HTML</label>
-        <textarea
-          id="htmlCode"
-          class="form-control code-box"
-          rows="10"
-          placeholder="Write your HTML code here..."
-        ></textarea>
-      </div>
-      <div class="form-group mb-3">
-        <label for="cssCode">CSS</label>
-        <textarea
-          id="cssCode"
-          class="form-control code-box"
-          rows="10"
-          placeholder="Write your CSS code here..."
-        ></textarea>
-      </div>
-      <div class="form-group mb-3">
-        <label for="jsCode">JavaScript</label>
-        <textarea
-          id="jsCode"
-          class="form-control code-box"
-          rows="10"
-          placeholder="Write your JavaScript code here..."
-        ></textarea>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Code Playground</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/theme/dracula.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #4a90e2;
+        --secondary-color: #50e3c2;
+        --bg-color: #f4f7f9;
+        --text-color: #333;
+        --border-color: #e0e0e0;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      h1 {
+        text-align: center;
+        color: var(--primary-color);
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .playground {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .code-section {
+        flex: 1;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+      }
+
+      .output-section {
+        flex: 1;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+      }
+
+      .tab-container {
+        display: flex;
+        margin-bottom: 1rem;
+      }
+
+      .tab {
+        padding: 0.5rem 1rem;
+        background-color: #f0f0f0;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .tab.active {
+        background-color: var(--primary-color);
+        color: #fff;
+      }
+
+      .code-editor {
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .output-frame {
+        width: 100%;
+        height: 400px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+      }
+
+      .live-update {
+        display: flex;
+        align-items: center;
+        margin-top: 1rem;
+      }
+
+      .live-update input {
+        margin-right: 0.5rem;
+      }
+
+      @media (max-width: 768px) {
+        .playground {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Code Playground</h1>
+      <div class="playground">
+        <div class="code-section">
+          <div class="tab-container">
+            <button class="tab active" data-lang="html">HTML</button>
+            <button class="tab" data-lang="css">CSS</button>
+            <button class="tab" data-lang="js">JavaScript</button>
+          </div>
+          <div class="code-editor" id="codeEditor"></div>
+          <div class="live-update">
+            <input type="checkbox" id="liveUpdate" checked />
+            <label for="liveUpdate">Live Update</label>
+          </div>
+        </div>
+        <div class="output-section">
+          <h3>Output</h3>
+          <iframe id="outputFrame" class="output-frame"></iframe>
+        </div>
       </div>
     </div>
-    <div class="col-md-6">
-      <h3>Output</h3>
-      <iframe
-        id="outputFrame"
-        style="width: 100%; height: 500px; border: 1px solid #ccc"
-      ></iframe>
-    </div>
-  </div>
-</div>
 
-<script>
-  const htmlCode = document.getElementById("htmlCode");
-  const cssCode = document.getElementById("cssCode");
-  const jsCode = document.getElementById("jsCode");
-  const outputFrame = document.getElementById("outputFrame");
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/javascript/javascript.min.js"></script>
+    <script>
+      const codeEditor = document.getElementById("codeEditor");
+      const outputFrame = document.getElementById("outputFrame");
+      const tabs = document.querySelectorAll(".tab");
+      const liveUpdateCheckbox = document.getElementById("liveUpdate");
 
-  function runCode() {
-    const output = outputFrame.contentWindow.document;
-    output.open();
-    output.write(
-      htmlCode.value +
-        "<style>" +
-        cssCode.value +
-        "</style><script>" +
-        jsCode.value +
-        "<\/script>"
-    );
-    output.close();
-  }
+      let editor = CodeMirror(codeEditor, {
+        mode: "htmlmixed",
+        theme: "dracula",
+        lineNumbers: true,
+        autoCloseTags: true,
+        autoCloseBrackets: true,
+        indentUnit: 4,
+      });
 
-  // Run code when typing in any of the textareas
-  htmlCode.addEventListener("input", runCode);
-  cssCode.addEventListener("input", runCode);
-  jsCode.addEventListener("input", runCode);
-</script>
+      let currentMode = "html";
+      let code = {
+        html: "",
+        css: "",
+        js: "",
+      };
 
-<style>
-  /* Custom Styles */
-  .code-box {
-    height: 150px; /* Fixed height for all code boxes */
-    font-family: "Courier New", Courier, monospace; /* Monospace font for code */
-    background-color: #f8f9fa; /* Light background for code boxes */
-    border: 1px solid #ced4da; /* Border for code boxes */
-    border-radius: 5px; /* Rounded corners */
-  }
+      function updateCode() {
+        code[currentMode] = editor.getValue();
+      }
 
-  .code-box:focus {
-    border-color: #28a745; /* Green border on focus */
-    box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); /* Subtle shadow effect */
-  }
+      function switchTab(mode) {
+        updateCode();
+        currentMode = mode;
+        editor.setOption("mode", mode === "html" ? "htmlmixed" : mode);
+        editor.setValue(code[mode]);
+        tabs.forEach((tab) => {
+          tab.classList.toggle("active", tab.dataset.lang === mode);
+        });
+      }
 
-  h3 {
-    margin-top: 1.5rem; /* Margin for output section title */
-  }
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => switchTab(tab.dataset.lang));
+      });
 
-  @media (max-width: 768px) {
-    .code-box {
-      height: 100px; /* Reduced height for smaller screens */
-    }
-  }
-</style>
+      function runCode() {
+        updateCode();
+        const output = outputFrame.contentWindow.document;
+        output.open();
+        output.write(
+          code.html +
+            "<style>" +
+            code.css +
+            "</style>" +
+            "<script>" +
+            code.js +
+            "<\/script>"
+        );
+        output.close();
+      }
+
+      editor.on("change", () => {
+        if (liveUpdateCheckbox.checked) {
+          updateCode();
+          runCode();
+        }
+      });
+
+      liveUpdateCheckbox.addEventListener("change", () => {
+        if (liveUpdateCheckbox.checked) {
+          runCode();
+        }
+      });
+
+      // Initial run
+      runCode();
+    </script>
+  </body>
+</html>
 {% endblock %}

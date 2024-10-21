@@ -26,8 +26,8 @@ Chat{% endblock %} {% block content %}
       {% endfor %}
     </div>
 
-    <div class="typing-indicator mt-2 mb-2" style="display: none">
-      <span id="typing-username"></span> is typing...
+    <div class="typing-indicator mt-2 mb-2">
+      <span>Someone is typing</span>
     </div>
 
     <div class="mt-4">
@@ -99,17 +99,17 @@ Chat{% endblock %} {% block content %}
         isCurrentUser ? "justify-end" : ""
       } mb-4 animate__animated animate__fadeIn`;
       messageDiv.innerHTML = `
-        <div class="message-bubble ${
-          isCurrentUser ? "message-bubble-right" : "message-bubble-left"
-        }">
-          <div class="text-sm opacity-75 mb-1">${data.username}</div>
-          ${data.msg}
-          <div class="text-xs opacity-75 mt-1">${new Date().toLocaleTimeString(
-            [],
-            { hour: "2-digit", minute: "2-digit" }
-          )}</div>
-        </div>
-      `;
+                <div class="message-bubble ${
+                  isCurrentUser ? "message-bubble-right" : "message-bubble-left"
+                }">
+                    <div class="text-sm opacity-75 mb-1">${data.username}</div>
+                    ${data.msg}
+                    <div class="text-xs opacity-75 mt-1">${new Date().toLocaleTimeString(
+                      [],
+                      { hour: "2-digit", minute: "2-digit" }
+                    )}</div>
+                </div>
+            `;
 
       messagesContainer.appendChild(messageDiv);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -119,17 +119,13 @@ Chat{% endblock %} {% block content %}
     socket.on("typing", function (data) {
       if (data.username !== currentUser) {
         const typingIndicator = document.querySelector(".typing-indicator");
-        const typingUsername = document.getElementById("typing-username");
-        typingUsername.textContent = data.username;
         typingIndicator.style.display = "inline-block";
       }
     });
 
-    socket.on("stop_typing", function (data) {
-      if (data.username !== currentUser) {
-        const typingIndicator = document.querySelector(".typing-indicator");
-        typingIndicator.style.display = "none";
-      }
+    socket.on("stop_typing", function () {
+      const typingIndicator = document.querySelector(".typing-indicator");
+      typingIndicator.style.display = "none";
     });
 
     // Handle online status

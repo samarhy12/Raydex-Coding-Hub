@@ -23,9 +23,7 @@
         <p class="course-description">{{ course.description[:100] }}...</p>
         <div class="course-meta">
           <span class="course-price">GHS{{ course.price }}</span>
-          <a href="/course/{{ course.id }}" class="btn course-btn"
-            >Enroll Now</a
-          >
+          <a href="/course/{{ course.id }}" class="btn btn-login">Enroll Now</a>
         </div>
       </div>
     </div>
@@ -129,6 +127,6 @@
 <div class="cta">
   <h2>Ready to Start Learning?</h2>
   <p>Join us today and take your first step towards mastering coding!</p>
-  <a href="/register" class="course-btn">Sign Up Now</a>
+  <a href="/register" class="btn btn-signup">Sign Up Now</a>
 </div>
 {% endblock %}

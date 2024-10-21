@@ -4,40 +4,42 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chat Users and Courses</title>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <style>
-      .chat-list::-webkit-scrollbar {
-        width: 6px;
-      }
-      .chat-list::-webkit-scrollbar-thumb {
-        background-color: #4a5568;
-        border-radius: 3px;
-      }
-      .online-indicator {
-        width: 10px;
-        height: 10px;
-        background-color: #68d391;
-        border-radius: 50%;
-        display: inline-block;
-      }
-      .unread-indicator {
-        width: 20px;
-        height: 20px;
-        background-color: #68d391;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 12px;
-        font-weight: bold;
-      }
-    </style>
   </head>
+  {% extends "base.html" %} {% block title %} Raydex Hub - Chat{% endblock %} {%
+  block content %}
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+    rel="stylesheet"
+  />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+  <style>
+    .chat-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .chat-list::-webkit-scrollbar-thumb {
+      background-color: #4a5568;
+      border-radius: 3px;
+    }
+    .online-indicator {
+      width: 10px;
+      height: 10px;
+      background-color: #68d391;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .unread-indicator {
+      width: 20px;
+      height: 20px;
+      background-color: #68d391;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+  </style>
   <body class="bg-gray-100">
     <div class="container mx-auto px-4 py-8">
       <div
@@ -270,3 +272,4 @@
     </script>
   </body>
 </html>
+{% endblock%}

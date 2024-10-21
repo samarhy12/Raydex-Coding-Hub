@@ -1,85 +1,4 @@
 {% extends "base.html" %} {% block content %}
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
-    margin: 0;
-    padding: 0;
-  }
-  .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  .header {
-    background-color: #ffffff;
-    padding: 10px 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  .header h1 {
-    color: #1877f2;
-    margin: 0;
-    padding: 0 20px;
-  }
-  .post-form {
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  .post-form textarea {
-    width: 100%;
-    border: none;
-    resize: none;
-    padding: 10px;
-    margin-bottom: 10px;
-    font-size: 18px;
-  }
-  .post-form button {
-    background-color: #1877f2;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  .post {
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  .post h2 {
-    margin-top: 0;
-  }
-  .post-meta {
-    color: #65676b;
-    font-size: 14px;
-    margin-bottom: 10px;
-  }
-  .post-actions {
-    margin-top: 15px;
-  }
-  .post-actions button {
-    background-color: #e4e6eb;
-    border: none;
-    padding: 8px 12px;
-    margin-right: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  .post-actions button:hover {
-    background-color: #d8dadf;
-  }
-</style>
-
 <div class="container">
   <!-- Post Form -->
   <div class="post-form">
@@ -88,32 +7,147 @@
         name="content"
         placeholder="What's on your mind?"
         rows="3"
+        required
       ></textarea>
-      <button type="submit">Post</button>
+      <button type="submit" class="btn">Share Post</button>
     </form>
   </div>
 
   <!-- Posts Container -->
   <div id="posts-container">
     {% for post in posts %}
-    <div class="post">
-      <h2>{{ post.author.username }}</h2>
-      <div class="post-meta">
-        {{ post.date_posted.strftime('%Y-%m-%d %H:%M:%S') }}
+    <div class="post" id="post-{{ post.id }}">
+      <div class="post-header">
+        <div>
+          <div class="post-author">{{ post.author.username }}</div>
+          <div class="post-meta">
+            {{ post.date_posted.strftime('%B %d, %Y at %I:%M %p') }}
+          </div>
+        </div>
+        {% if post.author == current_user %}
+        <div>
+          <button onclick="toggleEditForm('{{ post.id }}')" class="btn">
+            Edit
+          </button>
+          <form
+            action="{{ url_for('delete_post', post_id=post.id) }}"
+            method="POST"
+            style="display: inline"
+          >
+            <button
+              type="submit"
+              class="btn btn-danger"
+              onclick="return confirm('Are you sure you want to delete this post?')"
+            >
+              Delete
+            </button>
+          </form>
+        </div>
+        {% endif %}
       </div>
-      <p>{{ post.content }}</p>
-      <div class="post-actions">
-        <button>
-          <i class="fas fa-thumbs-up"></i> Like ({{ post.likes }})
-        </button>
-        <button
-          onclick="window.location.href='{{ url_for('view_post', post_id=post.id) }}'"
+
+      <div class="post-content" id="post-content-{{ post.id }}">
+        {{ post.content }}
+      </div>
+
+      <!-- Edit Form -->
+      <div class="edit-form" id="edit-form-{{ post.id }}">
+        <form
+          action="{{ url_for('edit_post', post_id=post.id) }}"
+          method="POST"
         >
-          <i class="fas fa-comment"></i> Comment ({{ post.comments|length }})
-        </button>
+          <textarea name="content" rows="3" required>
+{{ post.content }}</textarea
+          >
+          <button type="submit" class="btn">Save Changes</button>
+          <button
+            type="button"
+            class="btn"
+            onclick="toggleEditForm('{{ post.id }}')"
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
+
+      <!-- Comments Section -->
+      <div class="comments-section">
+        <h3>Comments</h3>
+        {% for comment in post.comments %}
+        <div class="comment">
+          <div class="comment-header">
+            <div class="comment-author">{{ comment.author.username }}</div>
+            <div class="comment-meta">
+              {{ comment.date_posted.strftime('%B %d, %Y at %I:%M %p') }}
+            </div>
+          </div>
+          <div class="comment-content">{{ comment.content }}</div>
+          {% if comment.author == current_user %}
+          <form
+            action="{{ url_for('delete_comment', comment_id=comment.id) }}"
+            method="POST"
+            style="display: inline; margin-top: 8px"
+          >
+            <button
+              type="submit"
+              class="btn btn-danger btn-sm"
+              onclick="return confirm('Are you sure you want to delete this comment?')"
+            >
+              Delete
+            </button>
+          </form>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <!-- Comment Form -->
+        {% if current_user.is_authenticated %}
+        <div class="comment-form">
+          <form
+            action="{{ url_for('comment_on_post', post_id=post.id) }}"
+            method="POST"
+          >
+            <textarea
+              name="content"
+              placeholder="Write a comment..."
+              rows="2"
+              required
+            ></textarea>
+            <button type="submit" class="btn">Comment</button>
+          </form>
+        </div>
+        {% endif %}
       </div>
     </div>
     {% endfor %}
   </div>
 </div>
+
+<script>
+  function toggleEditForm(postId) {
+    const contentDiv = document.getElementById(`post-content-${postId}`);
+    const editForm = document.getElementById(`edit-form-${postId}`);
+
+    if (editForm.classList.contains("active")) {
+      contentDiv.style.display = "block";
+      editForm.classList.remove("active");
+    } else {
+      contentDiv.style.display = "none";
+      editForm.classList.add("active");
+    }
+  }
+
+  // Flash messages fade out
+  document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function () {
+      const flashMessages = document.querySelectorAll(".alert");
+      flashMessages.forEach(function (message) {
+        message.style.opacity = "0";
+        setTimeout(function () {
+          message.remove();
+        }, 300);
+      });
+    }, 3000);
+  });
+</script>
 {% endblock %}

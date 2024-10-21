@@ -593,7 +593,7 @@ body {
   .btn-login,
   .btn-signup {
     display: block;
-    width: 100%;
+    width: 60%;
     margin-bottom: 0.5rem;
   }
 

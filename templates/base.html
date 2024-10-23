@@ -294,49 +294,6 @@
               }, 500);
           }, 5000);
       }
-
-      let deferredPrompt;
-
-      window.addEventListener('beforeinstallprompt', (e) => {
-          e.preventDefault();
-          deferredPrompt = e;
-          showAddToHomeScreen();
-      });
-
-      function showAddToHomeScreen() {
-          const addBtn = document.createElement('button');
-          addBtn.classList.add('add-to-home');
-          addBtn.textContent = 'Add to Home Screen';
-          addBtn.addEventListener('click', addToHomeScreen);
-          document.body.appendChild(addBtn);
-      }
-
-      function addToHomeScreen() {
-          if (deferredPrompt) {
-              deferredPrompt.prompt();
-              deferredPrompt.userChoice.then((choiceResult) => {
-                  if (choiceResult.outcome === 'accepted') {
-                      console.log('User accepted the A2HS prompt');
-                  } else {
-                      console.log('User dismissed the A2HS prompt');
-                  }
-                  deferredPrompt = null;
-              });
-          }
-      }
-
-      if ("serviceWorker" in navigator) {
-          window.addEventListener("load", function () {
-              navigator.serviceWorker.register("/service-worker.js").then(
-                  function (registration) {
-                      console.log("ServiceWorker registration successful with scope: ", registration.scope);
-                  },
-                  function (err) {
-                      console.log("ServiceWorker registration failed: ", err);
-                  }
-              );
-          });
-      }
     </script>
   </body>
 </html>

@@ -1155,16 +1155,6 @@ def handle_stop_typing(data):
     room = data['room']
     emit('stop_typing', {'username': current_user.username}, room=room)
 
-# PWA Manifest
-@app.route('/manifest.json')
-def manifest():
-    return app.send_static_file('manifest.json')
-
-# PWA Service Worker
-@app.route('/service-worker.js')
-def service_worker():
-    return app.send_static_file('service-worker.js')
-
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('404.html'), 404

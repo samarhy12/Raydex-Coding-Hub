@@ -259,7 +259,12 @@
       <div class="main-content">
         <div class="video-container">
           <div class="video-player">
-            <video id="currentVideo" controls>
+            <video
+              id="currentVideo"
+              oncontextmenu="return false"
+              controlsList="nodownload"
+              controls
+            >
               <source src="{{ videos[0].url }}" type="video/mp4" />
               Your browser does not support the video tag.
             </video>

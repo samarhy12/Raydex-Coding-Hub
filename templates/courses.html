@@ -4,7 +4,7 @@ endblock %} {% block content %}
   <h2 class="text-center mb-5">Available Courses</h2>
   <div class="courses">
     {% for course in courses %}
-    <div class="course-card">
+    <div class="course-card col-md-4 mx-auto">
       <img
         src="{{ url_for('static', filename='images/' + course.image) }}"
         alt="{{ course.title }}"

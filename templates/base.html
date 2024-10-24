@@ -88,6 +88,11 @@
       href="{{ url_for('static', filename='css/style.css') }}"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1220199510675200"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light">
@@ -118,26 +123,7 @@
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('forum') }}">Posts</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('chat_users') }}">Chat</a>
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="resourcesDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Resources
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="resourcesDropdown">
-                <li><a class="dropdown-item" href="#">Learning Paths</a></li>
-                <li><a class="dropdown-item" href="#">Skill Assessments</a></li>
-                <li><a class="dropdown-item" href="#">Career Support</a></li>
-              </ul>
-            </li>
+
             {% if current_user.is_authenticated %}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('code_playground') }}"
@@ -225,7 +211,6 @@
             <ul class="list-unstyled">
               <li><a href="{{ url_for('courses') }}">Courses</a></li>
               <li><a href="{{ url_for('forum') }}">Posts</a></li>
-              <li><a href="{{ url_for('chat_users') }}">Chat</a></li>
               <li><a href="#">Career Support</a></li>
             </ul>
           </div>

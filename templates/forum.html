@@ -1,153 +1,464 @@
-{% extends "base.html" %} {% block content %}
-<div class="container">
-  <!-- Post Form -->
-  <div class="post-form">
-    <form method="POST" action="{{ url_for('new_post') }}">
-      <textarea
-        name="content"
-        placeholder="What's on your mind?"
-        rows="3"
-        required
-      ></textarea>
-      <button type="submit" class="btn">Share Post</button>
-    </form>
-  </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Feed</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
 
-  <!-- Posts Container -->
-  <div id="posts-container">
-    {% for post in posts %}
-    <div class="post" id="post-{{ post.id }}">
-      <div class="post-header">
-        <div>
-          <div class="post-author">{{ post.author.username }}</div>
-          <div class="post-meta">
-            {{ post.date_posted.strftime('%B %d, %Y at %I:%M %p') }}
-          </div>
+        :root {
+            --primary-color: #3b82f6;
+            --danger-color: #ef4444;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Post Form Styles */
+        .post-form {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: transform 0.2s ease;
+        }
+
+        .post-form:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            resize: vertical;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* Post Styles */
+        .post {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .post-author {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .post-meta {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .post-content {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        /* Comments Section */
+        .comments-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .comments-section h3 {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .comment {
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .comment-author {
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .comment-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .comment-content {
+            font-size: 0.875rem;
+        }
+
+        /* Edit Form */
+        .edit-form {
+            display: none;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .edit-form.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            animation: slideIn 0.3s ease;
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Like Button Animation */
+        .like-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .like-button:hover {
+            background: var(--bg-secondary);
+        }
+
+        .like-button.liked {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .like-button i {
+            transition: transform 0.2s ease;
+        }
+
+        .like-button:hover i {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    {% extends "base.html" %}
+    {% block content %}
+    <div class="container">
+        <!-- Post Form -->
+        <div class="post-form">
+            <form method="POST" action="{{ url_for('new_post') }}" id="new-post-form">
+                <textarea 
+                    name="content" 
+                    placeholder="What's on your mind?" 
+                    rows="3" 
+                    required
+                ></textarea>
+                <button type="submit" class="btn btn-primary">Share Post</button>
+            </form>
         </div>
-        {% if post.author == current_user %}
-        <div>
-          <button onclick="toggleEditForm('{{ post.id }}')" class="btn">
-            Edit
-          </button>
-          <form
-            action="{{ url_for('delete_post', post_id=post.id) }}"
-            method="POST"
-            style="display: inline"
-          >
-            <button
-              type="submit"
-              class="btn btn-danger"
-              onclick="return confirm('Are you sure you want to delete this post?')"
-            >
-              Delete
-            </button>
-          </form>
-        </div>
-        {% endif %}
-      </div>
 
-      <div class="post-content" id="post-content-{{ post.id }}">
-        {{ post.content }}
-      </div>
+        <!-- Posts Container -->
+        <div id="posts-container">
+            {% for post in posts %}
+            <div class="post" id="post-{{ post.id }}">
+                <div class="post-header">
+                    <div>
+                        <div class="post-author">{{ post.author.username }}</div>
+                        <div class="post-meta">{{ post.date_posted.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                    </div>
+                    {% if post.author == current_user %}
+                    <div class="action-buttons">
+                        <button onclick="toggleEditForm('{{ post.id }}')" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" style="display: inline">
+                            <button type="submit" 
+                                class="btn btn-danger btn-sm" 
+                                onclick="return confirmDelete('post')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
 
-      <!-- Edit Form -->
-      <div class="edit-form" id="edit-form-{{ post.id }}">
-        <form
-          action="{{ url_for('edit_post', post_id=post.id) }}"
-          method="POST"
-        >
-          <textarea name="content" rows="3" required>
-{{ post.content }}</textarea
-          >
-          <button type="submit" class="btn">Save Changes</button>
-          <button
-            type="button"
-            class="btn"
-            onclick="toggleEditForm('{{ post.id }}')"
-          >
-            Cancel
-          </button>
-        </form>
-      </div>
+                <div class="post-content" id="post-content-{{ post.id }}">
+                    {{ post.content }}
+                </div>
 
-      <!-- Comments Section -->
-      <div class="comments-section">
-        <h3>Comments</h3>
-        {% for comment in post.comments %}
-        <div class="comment">
-          <div class="comment-header">
-            <div class="comment-author">{{ comment.author.username }}</div>
-            <div class="comment-meta">
-              {{ comment.date_posted.strftime('%B %d, %Y at %I:%M %p') }}
+                <!-- Like Button -->
+                <button class="like-button" onclick="toggleLike('{{ post.id }}')">
+                    <i class="far fa-heart"></i>
+                    <span id="likes-count-{{ post.id }}">0</span>
+                </button>
+
+                <!-- Edit Form -->
+                <div class="edit-form" id="edit-form-{{ post.id }}">
+                    <form action="{{ url_for('edit_post', post_id=post.id) }}" method="POST">
+                        <textarea name="content" rows="3" required>{{ post.content }}</textarea>
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+                            <button type="button" 
+                                class="btn btn-secondary btn-sm" 
+                                onclick="toggleEditForm('{{ post.id }}')">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="comments-section">
+                    <h3>Comments ({{ post.comments|length }})</h3>
+                    {% for comment in post.comments %}
+                    <div class="comment">
+                        <div class="comment-header">
+                            <div class="comment-author">{{ comment.author.username }}</div>
+                            <div class="comment-meta">
+                                {{ comment.date_posted.strftime('%B %d, %Y at %I:%M %p') }}
+                            </div>
+                        </div>
+                        <div class="comment-content">{{ comment.content }}</div>
+                        {% if comment.author == current_user %}
+                        <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" 
+                            method="POST" 
+                            style="margin-top: 8px">
+                            <button type="submit" 
+                                class="btn btn-danger btn-sm" 
+                                onclick="return confirmDelete('comment')">
+                                Delete
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <!-- Comment Form -->
+                    {% if current_user.is_authenticated %}
+                    <div class="comment-form">
+                        <form action="{{ url_for('comment_on_post', post_id=post.id) }}" method="POST">
+                            <textarea 
+                                name="content" 
+                                placeholder="Write a comment..." 
+                                rows="2" 
+                                required
+                            ></textarea>
+                            <button type="submit" class="btn btn-primary btn-sm">Comment</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-          </div>
-          <div class="comment-content">{{ comment.content }}</div>
-          {% if comment.author == current_user %}
-          <form
-            action="{{ url_for('delete_comment', comment_id=comment.id) }}"
-            method="POST"
-            style="display: inline; margin-top: 8px"
-          >
-            <button
-              type="submit"
-              class="btn btn-danger btn-sm"
-              onclick="return confirm('Are you sure you want to delete this comment?')"
-            >
-              Delete
-            </button>
-          </form>
-          {% endif %}
+            {% endfor %}
         </div>
-        {% endfor %}
-
-        <!-- Comment Form -->
-        {% if current_user.is_authenticated %}
-        <div class="comment-form">
-          <form
-            action="{{ url_for('comment_on_post', post_id=post.id) }}"
-            method="POST"
-          >
-            <textarea
-              name="content"
-              placeholder="Write a comment..."
-              rows="2"
-              required
-            ></textarea>
-            <button type="submit" class="btn">Comment</button>
-          </form>
-        </div>
-        {% endif %}
-      </div>
     </div>
-    {% endfor %}
-  </div>
-</div>
 
-<script>
-  function toggleEditForm(postId) {
-    const contentDiv = document.getElementById(`post-content-${postId}`);
-    const editForm = document.getElementById(`edit-form-${postId}`);
+    <script>
+        function toggleEditForm(postId) {
+            const contentDiv = document.getElementById(`post-content-${postId}`);
+            const editForm = document.getElementById(`edit-form-${postId}`);
 
-    if (editForm.classList.contains("active")) {
-      contentDiv.style.display = "block";
-      editForm.classList.remove("active");
-    } else {
-      contentDiv.style.display = "none";
-      editForm.classList.add("active");
-    }
-  }
+            if (editForm.classList.contains('active')) {
+                contentDiv.style.display = 'block';
+                editForm.classList.remove('active');
+            } else {
+                contentDiv.style.display = 'none';
+                editForm.classList.add('active');
+            }
+        }
 
-  // Flash messages fade out
-  document.addEventListener("DOMContentLoaded", function () {
-    setTimeout(function () {
-      const flashMessages = document.querySelectorAll(".alert");
-      flashMessages.forEach(function (message) {
-        message.style.opacity = "0";
-        setTimeout(function () {
-          message.remove();
-        }, 300);
-      });
-    }, 3000);
-  });
-</script>
-{% endblock %}
+        function confirmDelete(type) {
+            return confirm(`Are you sure you want to delete this ${type}?`);
+        }
+
+        function toggleLike(postId) {
+            const likeButton = document.querySelector(`#post-${postId} .like-button`);
+            const likesCount = document.getElementById(`likes-count-${postId}`);
+            
+            if (likeButton.classList.contains('liked')) {
+                likeButton.classList.remove('liked');
+                likesCount.textContent = parseInt(likesCount.textContent) - 1;
+            } else {
+                likeButton.classList.add('liked');
+                likesCount.textContent = parseInt(likesCount.textContent) + 1;
+                
+                // Add heart animation
+                const heart = likeButton.querySelector('i');
+                heart.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    heart.style.transform = 'scale(1)';
+                }, 200);
+            }
+        }
+
+        // Flash messages fade out
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const flashMessages = document.querySelectorAll('.alert');
+                flashMessages.forEach(function(message) {
+                    message.style.opacity = '0';
+                    setTimeout(function() {
+                        message.remove();
+                    }, 300);
+                });
+            }, 3000);
+        });
+
+        // Smooth scroll to newly created post
+        document.getElementById('new-post-form').addEventListener('submit', function(e) {
+            setTimeout(() => {
+                const newPost = document.querySelector('.post');
+                if (newPost) {
+                    newPost.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 100);
+        });
+    </script>
+    {% endblock %}
+</body>
+</html>

@@ -26,203 +26,95 @@ with app.app_context():
     db.session.bulk_save_objects(users)
     db.session.commit()
 
-    # Sample Courses (keeping the same as provided)
-    courses_data = [
-        {
-            'title': 'Python for Beginners',
-            'description': 'A complete course to learn Python programming from scratch.',
-            'price': 199.99,
-            'image': 'python.jpeg'
-        },
-        {
-            'title': 'Web Development with Flask',
-            'description': 'Learn to build web applications with Flask, a lightweight Python web framework.',
-            'price': 199.99,
-            'image': 'web.jpeg'
-        },
-        {
-            'title': 'Data Science with Python',
-            'description': 'Unlock the power of data with Python for data science.',
-            'price': 199.99,
-            'image': 'html.png'
-        },
-        {
-            'title': 'Machine Learning A-Z',
-            'description': 'Become a machine learning expert with this comprehensive course.',
-            'price': 199.99,
-            'image': 'images.jpeg'
-        }
-    ]
+    # HTML, CSS, and JavaScript Course
+    course_data = {
+        'title': 'HTML, CSS, and JavaScript',
+        'description': 'A complete guide to learning web development with HTML, CSS, and JavaScript.',
+        'price': 199.99,
+        'image': 'html.png'
+    }
 
-    courses = []
-    for course_data in courses_data:
-        course = Course(**course_data)
-        courses.append(course)
-
-    db.session.bulk_save_objects(courses)
+    course = Course(**course_data)
+    db.session.add(course)
     db.session.commit()
 
-    # Enhanced Lessons Data with Detailed Quizzes and Assignments
+    # Create 30 lessons for the HTML, CSS, and JavaScript course
     lessons_data = [
         {
-            'course_title': 'Python for Beginners',
-            'lessons': [
-                {
-                    'title': 'Introduction to Python',
-                    'content': 'In this lesson, you will learn about Python basics...',
-                    'quiz_content': '''
-                    <div class="quiz-container">
-                        <h2>Python Basics Quiz</h2>
-                        <form id="quiz-form">
-                            <div class="question">
-                                <p>1. What is the output of print(type(5))?</p>
-                                <input type="radio" name="q1" value="a"> <label>a) &lt;class 'str'&gt;</label><br>
-                                <input type="radio" name="q1" value="b"> <label>b) &lt;class 'int'&gt;</label><br>
-                                <input type="radio" name="q1" value="c"> <label>c) &lt;class 'float'&gt;</label><br>
-                                <input type="radio" name="q1" value="d"> <label>d) &lt;class 'number'&gt;</label>
-                            </div>
-                            <div class="question">
-                                <p>2. Which of these is a valid variable name in Python?</p>
-                                <input type="radio" name="q2" value="a"> <label>a) 2variable</label><br>
-                                <input type="radio" name="q2" value="b"> <label>b) my-variable</label><br>
-                                <input type="radio" name="q2" value="c"> <label>c) my_variable</label><br>
-                                <input type="radio" name="q2" value="d"> <label>d) class</label>
-                            </div>
-                        </form>
-                        <button onclick="checkAnswers()">Submit</button>
+            'title': f'Lesson {i+1}',
+            'content': f'Content for Lesson {i+1} on HTML, CSS, and JavaScript...',
+            'quiz_content': f'''
+            <div class="quiz-container">
+                <h2>Quiz for Lesson {i+1}</h2>
+                <form id="quiz-form">
+                    <div class="question">
+                        <p>1. Sample question for Lesson {i+1}?</p>
+                        <input type="radio" name="q1" value="a"> <label>a) Option A</label><br>
+                        <input type="radio" name="q1" value="b"> <label>b) Option B</label><br>
                     </div>
-                    <script>
-                        const correct_answers = {q1: 'b', q2: 'c'};
-                        function checkAnswers() {
-                            let score = 0;
-                            for (let q in correct_answers) {
-                                const selected = document.querySelector(`input[name="${q}"]:checked`);
-                                if (selected && selected.value === correct_answers[q]) score++;
-                            }
-                            alert(`You scored ${score} out of ${Object.keys(correct_answers).length}`);
-                        }
-                    </script>
-                    ''',
-                    'assignment_content': '''
-                    # Python Basic Calculator Assignment
-                    
-                    Create a simple calculator function that:
-                    1. Takes two numbers and an operator (+, -, *, /) as input
-                    2. Returns the result of the operation
-                    3. Handles division by zero errors
-                    4. Handles invalid operator errors
-                    
-                    Example template:
-    
-                    def calculator(num1, num2, operator):
-                        # Your code here
-                        pass
-                    
-                    # Test your function with these cases:
-                    # calculator(10, 5, '+')  # Should return 15
-                    # calculator(10, 5, '-')  # Should return 5
-                    # calculator(10, 5, '*')  # Should return 50
-                    # calculator(10, 5, '/')  # Should return 2.0
-                    # calculator(10, 0, '/')  # Should handle division by zero
-                    # calculator(10, 5, '%')  # Should handle invalid operator
-                    ''',
-                    'videos': [
-                        {'title': 'Python Basics', 'public_id': 'videoplayback_gdgxec', 'order': 1},
-                        {'title': 'Python Setup', 'public_id': 'videoplayback_gdgxec', 'order': 2}
-                    ]
-                },
-                {
-                    'title': 'Python Variables',
-                    'content': 'In this lesson, you will learn about variables in Python...',
-                    'quiz_content': '''
-                    <div class="quiz-container">
-                        <h2>Python Variables Quiz</h2>
-                        <form id="quiz-form">
-                            <div class="question">
-                                <p>1. What is the value of x after: x = 5; x += 3?</p>
-                                <input type="radio" name="q1" value="a"> <label>a) 5</label><br>
-                                <input type="radio" name="q1" value="b"> <label>b) 3</label><br>
-                                <input type="radio" name="q1" value="c"> <label>c) 8</label><br>
-                                <input type="radio" name="q1" value="d"> <label>d) 53</label>
-                            </div>
-                        </form>
-                        <button onclick="checkAnswers()">Submit</button>
-                    </div>
-                    <script>
-                        const correct_answers = {q1: 'c'};
-                        function checkAnswers() {
-                            let score = 0;
-                            for (let q in correct_answers) {
-                                const selected = document.querySelector(`input[name="${q}"]:checked`);
-                                if (selected && selected.value === correct_answers[q]) score++;
-                            }
-                            alert(`You scored ${score} out of ${Object.keys(correct_answers).length}`);
-                        }
-                    </script>
-                    ''',
-                    'assignment_content': '''
-                    # Temperature Converter Assignment
-                    
-                    Create a temperature conversion program that:
-                    1. Converts Celsius to Fahrenheit and vice versa
-                    2. Takes temperature value and unit (C or F) as input
-                    3. Returns the converted temperature with appropriate unit
-                    
-                    def convert_temperature(temp, unit):
-                        # Your code here
-                        pass
-                    
-                    # Test cases:
-                    # convert_temperature(32, 'F')  # Should return "0°C"
-                    # convert_temperature(0, 'C')   # Should return "32°F"
-                    ''',
-                    'videos': [
-                        {'title': 'Understanding Variables', 'public_id': 'videoplayback_gdgxec', 'order': 1},
-                        {'title': 'Variable Types', 'public_id': 'videoplayback_gdgxec', 'order': 2}
-                    ]
-                }
+                </form>
+                <button onclick="checkAnswers()">Submit</button>
+            </div>
+            <script>
+                const correct_answers = {{q1: 'a'}};
+                function checkAnswers() {{
+                    let score = 0;
+                    for (let q in correct_answers) {{
+                        const selected = document.querySelector(`input[name="${{q}}"]:checked`);
+                        if (selected && selected.value === correct_answers[q]) score++;
+                    }}
+                    alert(`You scored ${{score}} out of 1`);
+                }}
+            </script>
+            ''',
+            'assignment_content': f'''
+            # Assignment for Lesson {i+1}
+            
+            Write a simple HTML page that includes:
+            1. A heading with "Lesson {i+1}".
+            2. A paragraph describing what you learned in this lesson.
+            3. Any additional content related to Lesson {i+1}.
+            ''',
+            'videos': [
+                {'title': f'Video for Lesson {i+1}', 'public_id': 'videoplayback_gdgxec', 'order': i+1}
             ]
-        },
-        # Add similar detailed content for other courses...
+        } for i in range(30)
     ]
 
-    # Create lessons, quizzes, assignments, and videos
-    for course_data in lessons_data:
-        course = Course.query.filter_by(title=course_data['course_title']).first()
-        for lesson_data in course_data['lessons']:
-            # Create Lesson
-            lesson = Lesson(
-                title=lesson_data['title'],
-                content=lesson_data['content'],
-                course_id=course.id
-            )
-            db.session.add(lesson)
-            db.session.flush()
+    for lesson_data in lessons_data:
+        # Create Lesson
+        lesson = Lesson(
+            title=lesson_data['title'],
+            content=lesson_data['content'],
+            course_id=course.id
+        )
+        db.session.add(lesson)
+        db.session.flush()
 
-            # Create Quiz
-            quiz = Quiz(
-                content=lesson_data['quiz_content'],
+        # Create Quiz
+        quiz = Quiz(
+            content=lesson_data['quiz_content'],
+            lesson_id=lesson.id
+        )
+        db.session.add(quiz)
+
+        # Create Assignment
+        assignment = Assignment(
+            content=lesson_data['assignment_content'],
+            lesson_id=lesson.id
+        )
+        db.session.add(assignment)
+
+        # Create Video
+        for video_data in lesson_data['videos']:
+            video = Video(
+                title=video_data['title'],
+                public_id=video_data['public_id'],
+                order=video_data['order'],
                 lesson_id=lesson.id
             )
-            db.session.add(quiz)
-
-            # Create Assignment
-            assignment = Assignment(
-                content=lesson_data['assignment_content'],
-                lesson_id=lesson.id
-            )
-            db.session.add(assignment)
-
-            # Create Videos
-            for video_data in lesson_data['videos']:
-                video = Video(
-                    title=video_data['title'],
-                    public_id=video_data['public_id'],
-                    order=video_data['order'],
-                    lesson_id=lesson.id
-                )
-                db.session.add(video)
+            db.session.add(video)
 
     db.session.commit()
 
-    print("Database has been initialized with enhanced sample data!")
+    print("Database has been initialized with the HTML, CSS, and JavaScript course and 30 lessons!")

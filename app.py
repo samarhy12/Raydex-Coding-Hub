@@ -18,8 +18,6 @@ from logging.handlers import RotatingFileHandler
 from functools import wraps
 from dotenv import load_dotenv
 import requests
-from werkzeug.utils import secure_filename
-from flask_socketio import SocketIO, emit, join_room, leave_room
 from itsdangerous import URLSafeTimedSerializer
 
 # Initialize the app
@@ -47,7 +45,6 @@ PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'profile_pics')
 
 mail = Mail(app)
-socketio = SocketIO(app)
 
 ADMIN_SUPPORT_ROOM = 'admin_support'
 active_chats = {}
@@ -200,22 +197,6 @@ class Comment(db.Model):
     def __repr__(self):
         return f"Comment('{self.content}', '{self.date_posted}')"
 
-class ChatMessage(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
-    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    read = db.Column(db.Boolean, default=False)
-
-    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
-    course = db.relationship('Course', backref='chat_messages')
-    recipient = db.relationship('User', foreign_keys=[recipient_id], backref='received_messages')
-
-    def __repr__(self):
-        return f"ChatMessage('{self.content}', '{self.timestamp}')"
-    
 application = app
 from flask.cli import with_appcontext
 import click
@@ -680,13 +661,6 @@ def forum():
     posts = Post.query.order_by(Post.date_posted.desc()).all()
     return render_template('forum.html', posts=posts)
 
-# Route to view a single post and its comments
-@app.route("/forum/post/<int:post_id>")
-def view_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    comments = Comment.query.filter_by(post_id=post.id).all()
-    return render_template('view_post.html', post=post, comments=comments)
-
 # Route to create a new post
 @app.route("/forum/new_post", methods=['GET', 'POST'])
 @login_required
@@ -712,7 +686,7 @@ def edit_post(post_id):
         post.content = request.form['content']
         db.session.commit()
         flash('Your post has been updated!', 'success')
-        return redirect(url_for('view_post', post_id=post.id))
+        return redirect(url_for('forum'))
     
     return render_template('edit_post.html', post=post)
 
@@ -739,7 +713,7 @@ def comment_on_post(post_id):
     db.session.add(comment)
     db.session.commit()
     flash('Your comment has been added!', 'success')
-    return redirect(url_for('view_post', post_id=post.id))
+    return redirect(url_for('forum'))
 
 # Route to delete a comment
 @app.route("/forum/comment/<int:comment_id>/delete", methods=['POST'])
@@ -1039,121 +1013,6 @@ def data_science():
 def mobile_development():
     return render_template('mobile_development.html')
 
-@app.route('/api/messages/read', methods=['POST'])
-@login_required
-def mark_messages_read():
-    data = request.json
-    sender_id = data.get('sender_id')
-    ChatMessage.query.filter_by(sender_id=sender_id, recipient_id=current_user.id, read=False).update({'read': True})
-    db.session.commit()
-    return jsonify({'success': True})
-
-@socketio.on('request_online_users')
-def handle_online_users_request():
-    online_users = [user.username for user in connected_users]
-    emit('online_users_list', {'users': online_users})
-
-# Keep track of connected users
-connected_users = set()
-
-@app.route('/course/<int:course_id>/chat')
-@login_required
-def course_chat(course_id):
-    course = Course.query.get_or_404(course_id)
-    messages = ChatMessage.query.filter_by(course_id=course_id).order_by(ChatMessage.timestamp.asc()).all()
-    return render_template('course_chat.html', course=course, messages=messages)
-
-@app.route('/chat/<int:user_id>')
-@login_required
-def private_chat(user_id):
-    user = User.query.get_or_404(user_id)
-    
-    messages = ChatMessage.query.filter(
-        ((ChatMessage.sender_id == current_user.id) & (ChatMessage.recipient_id == user_id)) |
-        ((ChatMessage.sender_id == user_id) & (ChatMessage.recipient_id == current_user.id))
-    ).order_by(ChatMessage.timestamp.asc()).all()
-    
-    return render_template('private_chat.html', user=user, messages=messages)
-
-@app.route('/api/users')
-@login_required
-def get_users():
-    users = User.query.filter(User.id != current_user.id).all()
-    return jsonify([{'id': user.id, 'username': user.username, 'email': user.email} for user in users])
-
-@app.route('/api/courses')
-@login_required
-def get_courses():
-    # Assuming the user is enrolled in these courses
-    courses = Course.query.join(Enrollment).filter(Enrollment.user_id == current_user.id).all()
-    return jsonify([{'id': course.id, 'title': course.title} for course in courses])
-
-@app.route('/chat/users')
-@login_required
-def chat_users():
-    users = User.query.filter(User.id != current_user.id).all()
-    return render_template('chat_users.html', users=users)
-
-@socketio.on('join')
-def on_join(data):
-    username = current_user.username
-    room = data['room']
-    join_room(room)
-    emit('status', {'msg': f'{username} has entered the room.'}, room=room)
-
-@socketio.on('leave')
-def on_leave(data):
-    username = current_user.username
-    room = data['room']
-    leave_room(room)
-    emit('status', {'msg': f'{username} has left the room.'}, room=room)
-
-@socketio.on('message')
-def handle_message(data):
-    username = current_user.username
-    room = data['room']
-    message_type = data['type']
-    content = data['msg']
-
-    if message_type == 'course':
-        course_id = int(room.split('_')[1])
-        new_message = ChatMessage(content=content, sender_id=current_user.id, course_id=course_id)
-        # Emit to all users in the course room
-        emit('message', {'msg': content, 'username': username}, room=room)
-        # Emit new_message event to all users in the course
-        emit('new_message', {'sender': username, 'course_id': course_id}, room=room)
-    elif message_type == 'private':
-        recipient_id = data['recipient_id']
-        recipient = User.query.get(recipient_id)
-        new_message = ChatMessage(content=content, sender_id=current_user.id, recipient_id=recipient_id)
-        # Emit to the private room
-        emit('message', {'msg': content, 'username': username}, room=room)
-        # Emit new_message event to the recipient
-        emit('new_message', {'sender': username, 'recipient': recipient.username}, room=recipient.username)
-
-    db.session.add(new_message)
-    db.session.commit()
-
-@socketio.on('connect')
-def handle_connect():
-    connected_users.add(current_user)
-    join_room(current_user.username)  # Join a room named after the user's username
-    emit('user_connected', {'username': current_user.username}, broadcast=True)
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    connected_users.remove(current_user)
-    emit('user_disconnected', {'username': current_user.username}, broadcast=True)
-
-@socketio.on('typing')
-def handle_typing(data):
-    room = data['room']
-    emit('typing', {'username': current_user.username}, room=room)
-
-@socketio.on('stop_typing')
-def handle_stop_typing(data):
-    room = data['room']
-    emit('stop_typing', {'username': current_user.username}, room=room)
 
 @app.errorhandler(404)
 def not_found_error(error):
@@ -1170,4 +1029,4 @@ def handle_csrf_error(e):
 
 # Run the app
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    app.run(debug=True)

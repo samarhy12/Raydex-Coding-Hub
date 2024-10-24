@@ -61,7 +61,7 @@ cloudinary.config(
 
 # Initialize the database, bcrypt, and login manager
 db = SQLAlchemy(app)
-migrate = Migrate(app)
+migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'  # Redirect to login if user is not authenticated

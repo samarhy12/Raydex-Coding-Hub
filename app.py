@@ -282,12 +282,12 @@ def upload_video_to_cloudinary(file):
 
 def get_cloudinary_video_url(public_id):
     try:
-        url, options = cloudinary_url(public_id, resource_type="video", format="mp4")
+        url, options = cloudinary_url(public_id, resource_type="video", format="mp4", secure=True)
         return url
     except Exception as e:
         app.logger.error(f"Failed to get Cloudinary video URL: {e}")
         return None
-    
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}

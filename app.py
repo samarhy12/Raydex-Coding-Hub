@@ -27,6 +27,7 @@ load_dotenv()
 # Flask configuration
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_default_secret_key')  # Default if not found
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///site.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAIL_SERVER'] = 'mail.raydexhub.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True

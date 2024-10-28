@@ -11,10 +11,8 @@ with app.app_context():
 
     # Sample Users
     users_data = [
-        {'username': 'john_doe', 'email': 'john@example.com', 'password': 'password'},
-        {'username': 'jane_smith', 'email': 'jane@example.com', 'password': 'password123'},
-        {'username': 'alice_wonder', 'email': 'alice@example.com', 'password': 'mypassword'},
-        {'username': 'bob_builder', 'email': 'bob@example.com', 'password': 'builder123'},
+        {'username': 'Themma_target', 'email': 'agyareyraphael@example.com', 'password': '10836799'},
+        {'username': 'targettt', 'email': 'rywagyarey@gmail.com', 'password': '10836799'},
     ]
 
     users = []
@@ -76,7 +74,7 @@ with app.app_context():
             3. Any additional content related to Lesson {i+1}.
             ''',
             'videos': [
-                {'title': f'Video for Lesson {i+1}', 'public_id': 'videoplayback_gdgxec', 'order': i+1}
+                {'title': f'Video for Lesson {i+1}', 'public_id': 'Introduction_v2dk7a', 'order': i+1}
             ]
         } for i in range(30)
     ]
